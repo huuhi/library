@@ -2,7 +2,10 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.BookPageDTO;
 import zhijianhu.entity.Books;
+import zhijianhu.vo.BookVO;
+import zhijianhu.vo.PageVO;
 
 /**
 * @author windows
@@ -11,4 +14,5 @@ import zhijianhu.entity.Books;
 */
 public interface BooksService extends IService<Books> {
 
+    PageVO<BookVO> getBooksByPage(BookPageDTO page);
 }

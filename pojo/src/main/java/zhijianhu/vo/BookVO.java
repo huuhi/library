@@ -27,12 +27,12 @@ public class BookVO {
     /**
      * 分类ID
      */
-    private Integer clazzid;
+    private String clazz;
 
     /**
      * 存放地址ID
      */
-    private Integer addressid;
+    private String address;
 
     /**
      * 出版社
@@ -52,7 +52,7 @@ public class BookVO {
     /**
      * 1 可借 0不可借
      */
-    private Integer status;
+    private String status;
 
     /**
      * 出版日期

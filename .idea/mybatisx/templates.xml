@@ -6,7 +6,7 @@
         <option name="generateConfig">
           <GenerateConfig>
             <option name="annotationType" value="NONE" />
-            <option name="basePackage" value="zhijianhu.entity" />
+            <option name="basePackage" value="zhijianhu" />
             <option name="basePath" value="src/main/java" />
             <option name="classNameStrategy" value="camel" />
             <option name="encoding" value="UTF-8" />
@@ -16,7 +16,7 @@
             <option name="ignoreTablePrefix" value="" />
             <option name="ignoreTableSuffix" value="" />
             <option name="moduleName" value="pojo" />
-            <option name="modulePath" value="$PROJECT_DIR$/pojo" />
+            <option name="modulePath" value="$PROJECT_DIR$" />
             <option name="moduleUIInfoList">
               <list>
                 <ModuleInfoGo>
@@ -26,8 +26,8 @@
                   <option name="encoding" value="UTF-8" />
                   <option name="fileName" value="${domain.fileName}" />
                   <option name="fileNameWithSuffix" value="${domain.fileName}.java" />
-                  <option name="modulePath" value="$PROJECT_DIR$/pojo" />
-                  <option name="packageName" value="zhijianhu.entity." />
+                  <option name="modulePath" value="$PROJECT_DIR$" />
+                  <option name="packageName" value="zhijianhu." />
                 </ModuleInfoGo>
               </list>
             </option>
@@ -38,8 +38,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="Users" />
-                  <option name="tableName" value="users" />
+                  <option name="className" value="StorageAddress" />
+                  <option name="tableName" value="storage_address" />
                 </TableUIInfo>
               </list>
             </option>

@@ -2,9 +2,7 @@ package zhijianhu.libraryserver.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import zhijianhu.dto.BookPageDTO;
 import zhijianhu.libraryserver.service.BooksService;
 import zhijianhu.result.Result;
@@ -12,6 +10,7 @@ import zhijianhu.vo.BookVO;
 import zhijianhu.vo.PageVO;
 
 import java.awt.print.Book;
+import java.util.List;
 
 /**
  * @author 胡志坚
@@ -32,6 +31,39 @@ public class BookController {
         log.info("getBooksByPage: page={}", page);
          PageVO<BookVO>  books=bookService.getBooksByPage(page);
          return Result.success(books);
+    }
+
+    @PostMapping("/add")
+    public Result addBook(@RequestBody BookVO book) {
+        log.info("addBook: book={}", book);
+        boolean success = bookService.addBook(book);
+        return success ? Result.success() : Result.error("添加图书失败");
+    }
+
+    @GetMapping("/{id}")
+    public Result<BookVO> getBookById( @PathVariable Integer id) {
+        log.info("getBookById: id={}", id);
+        BookVO book = bookService.getBookById(id);
+        return book != null ? Result.success(book) : Result.error("图书不存在");
+    }
+
+    @PutMapping("/change")
+    public Result changeBook(@RequestBody BookVO book) {
+       boolean success =  bookService.changeBook(book);
+       return success ? Result.success() : Result.error("修改图书失败");
+    }
+    @PutMapping("/status/{id}")
+    public Result changeBookStatus(@PathVariable Integer id,@RequestParam Integer status) {
+        log.info("changeBookStatus: id={},status={}", id, status);
+        boolean success = bookService.changeBookStatus(id, status);
+        return success ? Result.success() : Result.error("修改图书状态失败");
+    }
+    @DeleteMapping("/{id}")
+    public Result deleteBook(@PathVariable("id") List<Integer> ids) {
+        log.info("deleteBook: id={}", ids);
+        boolean b = bookService.removeBatchByIds(ids);
+        return b ? Result.success() : Result.error("删除图书失败");
+
     }
 
 

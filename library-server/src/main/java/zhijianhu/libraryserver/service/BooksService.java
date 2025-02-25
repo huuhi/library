@@ -15,4 +15,12 @@ import zhijianhu.vo.PageVO;
 public interface BooksService extends IService<Books> {
 
     PageVO<BookVO> getBooksByPage(BookPageDTO page);
+
+    boolean addBook(BookVO book);
+
+    BookVO getBookById(Integer id);
+
+    boolean changeBook(BookVO book);
+
+    boolean changeBookStatus(Integer id, Integer status);
 }

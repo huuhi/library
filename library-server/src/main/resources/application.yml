@@ -30,3 +30,8 @@ mybatis-plus:
 library:
   jwt:
     user-ttl: 7200000
+  aliyun:
+    bucket-name: huzhijian-springboot-csse
+    region: cn-guangzhou
+    endpoint: https://oss-cn-guangzhou.aliyuncs.com
+    dir: /library

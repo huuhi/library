@@ -1,36 +1,41 @@
 {
   "groups": [
     {
+      "name": "library.aliyun",
+      "type": "zhijianhu.properties.AliOssProperties",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    },
+    {
       "name": "library.jwt",
       "type": "zhijianhu.properties.JwtProperties",
       "sourceType": "zhijianhu.properties.JwtProperties"
-    },
-    {
-      "name": "sky.alioss",
-      "type": "zhijianhu.properties.AliOssProperties",
-      "sourceType": "zhijianhu.properties.AliOssProperties"
     }
   ],
   "properties": [
     {
+      "name": "library.aliyun.bucket-name",
+      "type": "java.lang.String",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    },
+    {
+      "name": "library.aliyun.dir",
+      "type": "java.lang.String",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    },
+    {
+      "name": "library.aliyun.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    },
+    {
+      "name": "library.aliyun.region",
+      "type": "java.lang.String",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    },
+    {
       "name": "library.jwt.user-ttl",
       "type": "java.lang.Long",
       "sourceType": "zhijianhu.properties.JwtProperties"
-    },
-    {
-      "name": "sky.alioss.bucket-name",
-      "type": "java.lang.String",
-      "sourceType": "zhijianhu.properties.AliOssProperties"
-    },
-    {
-      "name": "sky.alioss.endpoint",
-      "type": "java.lang.String",
-      "sourceType": "zhijianhu.properties.AliOssProperties"
-    },
-    {
-      "name": "sky.alioss.region",
-      "type": "java.lang.String",
-      "sourceType": "zhijianhu.properties.AliOssProperties"
     }
   ],
   "hints": []

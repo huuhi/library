@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -37,12 +38,12 @@ public class Books implements Serializable {
     /**
      * 分类ID
      */
-    private Integer clazzid;
+    private Integer clazzId;
 
     /**
      * 存放地址ID
      */
-    private Integer addressid;
+    private Integer addressId;
 
     /**
      * 出版社
@@ -72,12 +73,12 @@ public class Books implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     /**
      * 

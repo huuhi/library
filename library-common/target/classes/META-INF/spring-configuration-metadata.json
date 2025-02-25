@@ -1,0 +1,37 @@
+{
+  "groups": [
+    {
+      "name": "library.jwt",
+      "type": "zhijianhu.properties.JwtProperties",
+      "sourceType": "zhijianhu.properties.JwtProperties"
+    },
+    {
+      "name": "sky.alioss",
+      "type": "zhijianhu.properties.AliOssProperties",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "library.jwt.user-ttl",
+      "type": "java.lang.Long",
+      "sourceType": "zhijianhu.properties.JwtProperties"
+    },
+    {
+      "name": "sky.alioss.bucket-name",
+      "type": "java.lang.String",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    },
+    {
+      "name": "sky.alioss.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    },
+    {
+      "name": "sky.alioss.region",
+      "type": "java.lang.String",
+      "sourceType": "zhijianhu.properties.AliOssProperties"
+    }
+  ],
+  "hints": []
+}

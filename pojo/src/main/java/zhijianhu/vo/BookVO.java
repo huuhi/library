@@ -2,6 +2,7 @@ package zhijianhu.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  * 说明:
  */
 @Data
-public class BookVO {
+public class BookVO implements Serializable {
      private Integer id;
 
     /**

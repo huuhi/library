@@ -12,9 +12,9 @@ import lombok.Data;
 public class BookPageDTO {
     private String name;
     private Integer status;
-    private String author;
     private Integer page=1;
     private Integer pageSize=10;
+    private Integer categoryId;
 
 
 }

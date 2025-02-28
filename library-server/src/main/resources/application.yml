@@ -7,10 +7,10 @@ spring:
   servlet:
     encoding:
       charset: UTF-8
-      multipart:
-        enabled: true
-        max-file-size: 2MB
-        max-request-size: 2MB
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 10MB
 
 logging:
   level:
@@ -23,6 +23,9 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+      logic-delete-field: isAudit
+      logic-delete-value: 0
+      logic-not-delete-value: 1
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
   pagination:
@@ -34,4 +37,4 @@ library:
     bucket-name: huzhijian-springboot-csse
     region: cn-guangzhou
     endpoint: https://oss-cn-guangzhou.aliyuncs.com
-    dir: /library
+    dir: library

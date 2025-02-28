@@ -1,16 +1,16 @@
 package zhijianhu.libraryserver.service.impl;
 
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import zhijianhu.entity.BookClasses;
 import zhijianhu.libraryserver.mapper.BookClassesMapper;
 import zhijianhu.libraryserver.service.BookClassesService;
+import zhijianhu.vo.ClazzVO;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
 * @author windows
@@ -36,6 +36,13 @@ public class BookClassesServiceImpl extends ServiceImpl<BookClassesMapper, BookC
         return String.join("/", pathSegments);
     }
 
+    @Override
+    public List<ClazzVO> getBossClazz() {
+        List<BookClasses> list = lambdaQuery().isNull(BookClasses::getParentId)
+                .list();
+        return BeanUtil.copyToList(list, ClazzVO.class);
+    }
+
     private void findParent(Integer classId, List<String> pathSegments) {
         BookClasses current = bookClassMapper.selectById(classId);
         if (current == null) return;
@@ -47,6 +54,54 @@ public class BookClassesServiceImpl extends ServiceImpl<BookClassesMapper, BookC
         }
     }
 
+    // BookClassesServiceImpl.java
+    @Override
+    public List<Integer> getAllSubCategoryIds(Integer categoryId) {
+        // 递归查询所有子分类ID（含自身）
+        List<BookClasses> allCategories = this.list();
+        Map<Integer, List<Integer>> parentChildMap = new HashMap<>();
+
+        // 构建父-子分类映射
+        allCategories.forEach(category -> {
+            Integer parentId = category.getParentId() != null ?
+                             category.getParentId() : 0;
+            parentChildMap.computeIfAbsent(parentId, k -> new ArrayList<>())
+                         .add(category.getId());
+        });
+
+        // 递归收集所有子分类
+        List<Integer> result = new ArrayList<>();
+        collectSubCategories(categoryId, parentChildMap, result);
+        return result;
+    }
+
+    @Override
+    public List<ClazzVO> getAllClazz() {
+        List<BookClasses> list = this.list();
+        ArrayList<ClazzVO> clazzVOList = new ArrayList<>();
+        list.forEach(item -> {
+            Integer id = item.getId();
+            String clazz = this.getFullPath(id);
+            ClazzVO clazzVO = ClazzVO
+                    .builder()
+                    .id(id)
+                    .name(clazz)
+                    .build();
+            clazzVOList.add(clazzVO);
+        });
+        return clazzVOList;
+    }
+
+    private void collectSubCategories(Integer currentId,
+                                     Map<Integer, List<Integer>> parentChildMap,
+                                     List<Integer> result) {
+        result.add(currentId);
+        List<Integer> children = parentChildMap.get(currentId);
+        if (children != null) {
+            children.forEach(childId ->
+                collectSubCategories(childId, parentChildMap, result));
+        }
+    }
 }
 
 

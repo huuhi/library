@@ -7,19 +7,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.BookPageDTO;
+import zhijianhu.dto.ChangeBookStatusDTO;
 import zhijianhu.entity.Books;
+import zhijianhu.entity.Publish;
 import zhijianhu.entity.StorageAddress;
+import zhijianhu.exception.LendFileException;
 import zhijianhu.libraryserver.mapper.BooksMapper;
-import zhijianhu.libraryserver.service.BookClassesService;
-import zhijianhu.libraryserver.service.BooksService;
-import zhijianhu.libraryserver.service.StorageAddressService;
+import zhijianhu.libraryserver.service.*;
 import zhijianhu.query.PageQuery;
 import zhijianhu.vo.BookVO;
 import zhijianhu.vo.PageVO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,6 +38,10 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
     private BookClassesService bookClassesService;
     @Autowired
     private StorageAddressService storageAddressService;
+    @Autowired
+    private BorrowRecordsService borrowRecordsService;
+    @Autowired
+    private PublishService publishService;
 
     @Override
     public PageVO<BookVO> getBooksByPage(BookPageDTO bookDTO) {
@@ -42,22 +49,39 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
         pageQuery.setPage(bookDTO.getPage());
         pageQuery.setPageSize(bookDTO.getPageSize());
         String name = bookDTO.getName();
-        String author = bookDTO.getAuthor();
         Integer status = bookDTO.getStatus();
+        Integer categoryId = bookDTO.getCategoryId();
+//        获取categoryId的所有子分类
+        List<Integer> categoryIds = null;
+        if (categoryId != null) {
+            categoryIds = bookClassesService.getAllSubCategoryIds(categoryId);
+            if (!categoryIds.contains(categoryId)) {
+                categoryIds.add(categoryId);
+            }
+        }
         Page<Books> page = pageQuery.toMpPage(OrderItem.desc("publish_date"));
-        Page<Books> booksPage = lambdaQuery().like(name != null, Books::getName, name)
-                .like(author != null, Books::getAuthor, author)
+//        获取到了父类父类的id，我们需要查找父类类id以及子类id
+       Page<Books> booksPage = lambdaQuery()
                 .eq(status != null, Books::getStatus, status)
+                .and(name != null, wrapper -> wrapper  // [!code focus]
+                        .like(Books::getName, name)        // [!code focus]
+                        .or()                              // [!code focus]
+                        .like(Books::getAuthor, name)      // [!code focus]
+                )
+               .in(categoryIds!=null, Books::getClazzId,categoryIds)
                 .page(page);
         return PageVO.of(booksPage, book -> {
             Integer addressId = book.getAddressId();
             Integer clazzId = book.getClazzId();
             Integer status1 = book.getStatus();
+            Integer publishId = book.getPublishId();
             String address = storageAddressService.getById(addressId).getAddress();
             String fullPath = bookClassesService.getFullPath(clazzId);
+            String publishName = publishService.getById(publishId).getName();
             BookVO bookVO = BeanUtil.copyProperties(book, BookVO.class);
             bookVO.setAddress(address);
             bookVO.setClazz(fullPath);
+            bookVO.setPublish(publishName);
             if(Objects.equals(status1, StatusConstant.ENABLE)){
                 bookVO.setStatus("可借");
             }else{
@@ -80,11 +104,14 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
         Integer addressId = book.getAddressId();
         Integer clazzId = book.getClazzId();
         Integer status1 = book.getStatus();
+        Integer publishId = book.getPublishId();
         String address = storageAddressService.getById(addressId).getAddress();
         String fullPath = bookClassesService.getFullPath(clazzId);
+        String publishName = publishService.getById(publishId).getName();
         BookVO bookVO = BeanUtil.copyProperties(book, BookVO.class);
         bookVO.setAddress(address);
         bookVO.setClazz(fullPath);
+        bookVO.setPublish(publishName);
         if(Objects.equals(status1, StatusConstant.ENABLE)){
             bookVO.setStatus("可借");
         }else{
@@ -101,7 +128,21 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
     }
 
     @Override
-    public boolean changeBookStatus(Integer id, Integer status) {
+    public boolean changeBookStatus(ChangeBookStatusDTO dto) {
+//        需要判断是借书还是还书
+//        借书：status=0，还书：status=1
+        Integer id = dto.getBookId();
+        Integer status = dto.getStatus();
+        Integer userId = dto.getUserId();
+        boolean isSuccess;
+        if(Objects.equals(status, StatusConstant.DISABLE)){
+            isSuccess =  borrowRecordsService.addBorrowRecord(id, userId);
+        }else{
+            isSuccess= borrowRecordsService.deleteBorrowRecord(id, userId);
+        }
+        if(!isSuccess){
+            throw new LendFileException(MessageConstant.LEND_BOOK_FAIL);
+        }
         Books book = getById(id);
         book.setStatus(status);
         book.setUpdateTime(LocalDateTime.now());

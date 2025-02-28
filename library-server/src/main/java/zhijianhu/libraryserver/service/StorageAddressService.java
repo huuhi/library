@@ -3,6 +3,9 @@ package zhijianhu.libraryserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import zhijianhu.entity.StorageAddress;
+import zhijianhu.vo.AddressVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -10,5 +13,8 @@ import zhijianhu.entity.StorageAddress;
 * @createDate 2025-02-25 21:16:39
 */
 public interface StorageAddressService extends IService<StorageAddress> {
+
+
+     List<AddressVO> getAddress();
 
 }

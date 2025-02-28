@@ -3,7 +3,9 @@ package zhijianhu.libraryserver.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.BookPageDTO;
+import zhijianhu.dto.ChangeBookStatusDTO;
 import zhijianhu.libraryserver.service.BooksService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.BookVO;
@@ -11,6 +13,7 @@ import zhijianhu.vo.PageVO;
 
 import java.awt.print.Book;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author 胡志坚
@@ -52,10 +55,15 @@ public class BookController {
        boolean success =  bookService.changeBook(book);
        return success ? Result.success() : Result.error("修改图书失败");
     }
-    @PutMapping("/status/{id}")
-    public Result changeBookStatus(@PathVariable Integer id,@RequestParam Integer status) {
-        log.info("changeBookStatus: id={},status={}", id, status);
-        boolean success = bookService.changeBookStatus(id, status);
+//    借书 以及 还书
+    @PutMapping("/status")
+    public Result changeBookStatus(@RequestBody ChangeBookStatusDTO dto) {
+        if(dto.getStatus() == StatusConstant.DISABLE){
+            log.info("借书：{}",dto);
+        }else{
+            log.info("还书：{}",dto);
+        }
+        boolean success = bookService.changeBookStatus(dto);
         return success ? Result.success() : Result.error("修改图书状态失败");
     }
     @DeleteMapping("/{id}")

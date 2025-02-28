@@ -3,6 +3,9 @@ package zhijianhu.libraryserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import zhijianhu.entity.BookClasses;
+import zhijianhu.vo.ClazzVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -11,4 +14,12 @@ import zhijianhu.entity.BookClasses;
 */
 public interface BookClassesService extends IService<BookClasses> {
     String getFullPath(Integer id);
+
+     List<ClazzVO> getBossClazz();
+
+    List<Integer> getAllSubCategoryIds(Integer categoryId);
+
+
+    List<ClazzVO> getAllClazz();
+
 }

@@ -37,10 +37,10 @@ public class UserController {
     private JwtProperties JwtProperties;
 
     @PostMapping("/login")
-    public Result<UserLoginVO> login(UserLoginDTO userLoginDTO) {
+    public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
         log.info("用户登录：{}", userLoginDTO);
         Users user=usersService.login(userLoginDTO);
-
+        String image = user.getImage();
         HashMap<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
         String token = JwtUtil.createJWT(
@@ -52,13 +52,14 @@ public class UserController {
                 .role(user.getRole())
                 .name(user.getName())
                 .token(token)
+                .image(image)
                 .build();
         return Result.success(userLoginVO);
     }
 
 //   用户注册
     @PostMapping("/register")
-    public Result register( @RequestBody UserDTO userDTO) {
+    public Result register(@RequestBody UserDTO userDTO) {
         log.info("用户注册：{}", userDTO);
         boolean result = usersService.register(userDTO);
         return result?Result.success():Result.error("注册失败");

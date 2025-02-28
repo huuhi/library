@@ -48,7 +48,7 @@ public class Books implements Serializable {
     /**
      * 出版社
      */
-    private String publish;
+    private Integer publishId;
 
     /**
      * 国际标准书号

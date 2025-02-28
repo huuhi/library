@@ -59,18 +59,4 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 
     //在请求处理之后调用，但是在视图被渲染之前（Controller方法调用之后），
     // 也就是说在这个方法中对ModelAndView对象进行操作，可以对ModelAndView对象进行设置。
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        log.info("postHandle");
-        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-
-    }
-
-    @Override
-    //在整个请求处理完毕之后调用，也就是在视图渲染之后，也就是说在这个方法中对response对象进行操作，
-    // 可以对response对象进行设置。
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        log.info("afterCompletion");
-        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
-    }
 }

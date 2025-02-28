@@ -32,17 +32,17 @@ public class BookDTO{
     /**
      * 分类ID
      */
-    private Integer clazzid;
+    private Integer clazzId;
 
     /**
      * 存放地址ID
      */
-    private Integer addressid;
+    private Integer addressId;
 
     /**
      * 出版社
      */
-    private String publish;
+    private Integer publishId;
 
     /**
      * 国际标准书号

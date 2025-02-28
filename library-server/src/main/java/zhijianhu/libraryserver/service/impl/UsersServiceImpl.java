@@ -49,7 +49,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         }
         // 加密密码
 
-        if(encoder.matches(password, user.getPassword())){
+        if(!encoder.matches(password, user.getPassword())){
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
 

@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import zhijianhu.entity.StorageAddress;
 import zhijianhu.libraryserver.mapper.StorageAddressMapper;
 import zhijianhu.libraryserver.service.StorageAddressService;
+import zhijianhu.vo.AddressVO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author windows
@@ -16,6 +20,24 @@ import zhijianhu.libraryserver.service.StorageAddressService;
 public class StorageAddressServiceImpl extends ServiceImpl<StorageAddressMapper, StorageAddress>
     implements StorageAddressService {
 
+
+    @Override
+    public List<AddressVO> getAddress() {
+//        查询所有的地址
+        List<StorageAddress> list = list();
+        List<AddressVO> addressVOList = new ArrayList<>();
+        list.forEach(storageAddress ->{
+            String address = storageAddress.getAddress();
+            Integer id = storageAddress.getId();
+            AddressVO addressVO = AddressVO
+                    .builder()
+                    .id(id)
+                    .address(address)
+                    .build();
+            addressVOList.add(addressVO);
+        });
+        return addressVOList;
+    }
 }
 
 

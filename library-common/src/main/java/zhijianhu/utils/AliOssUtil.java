@@ -46,6 +46,7 @@ public class AliOssUtil {
         //生成一个新的不重复的文件名
         String newFileName = UUID.randomUUID() + originalFilename.substring(originalFilename.lastIndexOf("."));
         String objectName = dir + "/" + newFileName;
+        log.info("objectName: {}", objectName);
 
         // 创建OSSClient实例。
         ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();

@@ -9,11 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.constant.StatusConstant;
+import zhijianhu.dto.BookDTO;
 import zhijianhu.dto.BookPageDTO;
 import zhijianhu.dto.ChangeBookStatusDTO;
 import zhijianhu.entity.Books;
-import zhijianhu.entity.Publish;
-import zhijianhu.entity.StorageAddress;
 import zhijianhu.exception.LendFileException;
 import zhijianhu.libraryserver.mapper.BooksMapper;
 import zhijianhu.libraryserver.service.*;
@@ -92,7 +91,7 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
     }
 
     @Override
-    public boolean addBook(BookVO book) {
+    public boolean addBook(BookDTO book) {
         Books books = BeanUtil.copyProperties(book, Books.class);
         books.setCreateTime(LocalDateTime.now());
         return save(books);

@@ -4,25 +4,4 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="zhijianhu.libraryserver.mapper.BorrowRecordsMapper">
 
-    <resultMap id="BaseResultMap" type="zhijianhu.entity.BorrowRecords">
-            <id property="id" column="id" jdbcType="INTEGER"/>
-            <result property="userId" column="user_id" jdbcType="INTEGER"/>
-            <result property="bookId" column="book_id" jdbcType="INTEGER"/>
-            <result property="image" column="image" jdbcType="VARCHAR"/>
-            <result property="status" column="status" jdbcType="TINYINT"/>
-            <result property="lendTime" column="lend_time" jdbcType="TIMESTAMP"/>
-            <result property="mustReturnTime" column="must_return_time" jdbcType="TIMESTAMP"/>
-            <result property="returnTime" column="return_time" jdbcType="TIMESTAMP"/>
-            <result property="overdueDays" column="overdue_days" jdbcType="SMALLINT"/>
-            <result property="violationReason" column="violation_reason" jdbcType="VARCHAR"/>
-            <result property="penaltyAmount" column="penalty_amount" jdbcType="DECIMAL"/>
-            <result property="note" column="note" jdbcType="VARCHAR"/>
-    </resultMap>
-
-    <sql id="Base_Column_List">
-        id,user_id,book_id,
-        image,status,lend_time,
-        must_return_time,return_time,overdue_days,
-        violation_reason,penalty_amount,note
-    </sql>
 </mapper>

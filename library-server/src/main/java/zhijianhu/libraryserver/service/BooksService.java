@@ -2,6 +2,7 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.BookDTO;
 import zhijianhu.dto.BookPageDTO;
 import zhijianhu.dto.ChangeBookStatusDTO;
 import zhijianhu.entity.Books;
@@ -17,7 +18,7 @@ public interface BooksService extends IService<Books> {
 
     PageVO<BookVO> getBooksByPage(BookPageDTO page);
 
-    boolean addBook(BookVO book);
+    boolean addBook(BookDTO book);
 
     BookVO getBookById(Integer id);
 

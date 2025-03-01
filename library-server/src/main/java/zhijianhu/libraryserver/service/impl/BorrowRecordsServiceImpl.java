@@ -1,35 +1,57 @@
 package zhijianhu.libraryserver.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import zhijianhu.constant.StatusConstant;
+import zhijianhu.dto.BorrowPageDTO;
 import zhijianhu.entity.Books;
 import zhijianhu.entity.BorrowRecords;
+import zhijianhu.entity.Users;
+import zhijianhu.enumPojo.BorrowStatus;
 import zhijianhu.libraryserver.mapper.BooksMapper;
-import zhijianhu.libraryserver.service.BorrowRecordsService;
 import zhijianhu.libraryserver.mapper.BorrowRecordsMapper;
-import org.springframework.stereotype.Service;
+import zhijianhu.libraryserver.service.BorrowRecordsService;
+import zhijianhu.libraryserver.service.UsersService;
+import zhijianhu.query.PageQuery;
+import zhijianhu.vo.BorrowVO;
+import zhijianhu.vo.PageVO;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+
+
 
 /**
 * @author windows
 * @description 针对表【borrow_records(借阅记录表)】的数据库操作Service实现
-* @createDate 2025-02-26 13:54:47
+* @createDate 2025-03-01 13:45:52
 */
 @Service
 public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, BorrowRecords>
-    implements BorrowRecordsService{
-
-
+    implements BorrowRecordsService {
     @Autowired
     private BooksMapper booksService;
+    @Autowired
+    private UsersService usersService;
+
     @Override
     public boolean deleteBorrowRecord(Integer bookId, Integer userId) {
         //修改借阅信息
         BorrowRecords one = lambdaQuery()
                 .eq(BorrowRecords::getUserId, userId)
-                .eq(BorrowRecords::getBookId, bookId).one();
+                .eq(BorrowRecords::getBookId, bookId)
+                .eq(BorrowRecords::getStatus,StatusConstant.ENABLE)
+                .one();
         one.setStatus(StatusConstant.DISABLE);
         one.setReturnTime(LocalDateTime.now());
         return updateById(one);
@@ -49,9 +71,94 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
                 .mustReturnTime(mustReturnTime)
                 .build();
         return save(record);
-
-
     }
+
+    @Override
+    public PageVO<BorrowVO> getBorrowList(BorrowPageDTO borrowPageDTO) {
+        PageQuery pageQuery = new PageQuery();
+        pageQuery.setPage(borrowPageDTO.getPageNum());
+        pageQuery.setPageSize(borrowPageDTO.getPageSize());
+        //        按照借阅时间排序
+        Page<BorrowRecords> mpPage = pageQuery.toMpPage(OrderItem.desc("lend_time"));
+
+        Integer status = borrowPageDTO.getStatus();
+        Integer userId = borrowPageDTO.getUserId();
+        Page<BorrowRecords> recordsPage = lambdaQuery()
+                .eq(status != null, BorrowRecords::getStatus, status)
+                .eq(userId != null, BorrowRecords::getUserId, userId)
+                .page(mpPage);
+
+//        判断是否有数据
+          if (recordsPage == null || CollectionUtils.isEmpty(recordsPage.getRecords())) {
+                return PageVO.of(new Page<>(pageQuery.getPage(), pageQuery.getPageSize()), BorrowVO.class);
+            }
+          // 批量预加载
+        Set<Integer> userIds = recordsPage.getRecords().stream()
+            .map(BorrowRecords::getUserId)
+            .collect(Collectors.toSet());
+        Map<Integer, Users> userMap = usersService.listByIds(userIds)
+            .stream().collect(Collectors.toMap(Users::getId, u -> u));
+
+        Set<Integer> bookIds = recordsPage.getRecords().stream()
+            .map(BorrowRecords::getBookId)
+            .collect(Collectors.toSet());
+        Map<Integer, Books> bookMap = booksService.selectBatchIds(bookIds)
+            .stream().collect(Collectors.toMap(Books::getId, b -> b));
+
+
+
+        return PageVO.of(recordsPage,record->{
+            BorrowVO vo = new BorrowVO();
+            BeanUtils.copyProperties(record, vo);
+
+            // 安全获取关联数据
+            vo.setUserName(Optional.ofNullable(userMap.get(record.getUserId()))
+                .map(Users::getName)
+                .orElse("未知用户"));
+
+            vo.setBookName(Optional.ofNullable(bookMap.get(record.getBookId()))
+                .map(Books::getName)
+                .orElse("已下架"));
+
+            vo.setStatusName(BorrowStatus.getNameByCode(record.getStatus()));
+            return vo;
+        });
+    }
+
+    @Override
+    public BorrowVO getBorrowById(Integer id) {
+        BorrowRecords records = getById(id);
+//        根据id查询直接去数据库查询
+        Integer status = records.getStatus();
+        Integer userId = records.getUserId();
+        Integer bookId = records.getBookId();
+        BorrowVO borrowVO = BeanUtil.copyProperties(records, BorrowVO.class);
+        borrowVO.setStatusName(BorrowStatus.getNameByCode(status));
+        borrowVO.setUserName(Optional.ofNullable(usersService.getById(userId).getName()).orElse("未知用户"));
+        borrowVO.setBookName(Optional.ofNullable(booksService.selectById(bookId).getName()).orElse("未知书籍"));
+        return borrowVO;
+    }
+
+    @Override
+    public Integer getBorrowCount(Integer userId) {
+        Long count = lambdaQuery()
+                .eq(userId != null, BorrowRecords::getUserId, userId)
+                .eq(BorrowRecords::getStatus, StatusConstant.ENABLE)
+                .count();
+        return count.intValue();
+    }
+
+    @Override
+    public Integer getUserBorrowCount(Integer userId) {
+        Long count = lambdaQuery()
+                .eq(BorrowRecords::getUserId, userId)
+                .count();
+        return  count.intValue();
+    }
+//
+
+
+
 }
 
 

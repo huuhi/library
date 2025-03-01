@@ -99,6 +99,13 @@ public class UserController {
         return Result.success(pageVO);
 
     }
-
 //    根据id查询
+    @GetMapping("/{id}")
+    public Result<UserPageVO> getById(@PathVariable("id") Integer id){
+        log.info("根据id查询用户{}",id);
+        Users user = usersService.getById(id);
+        UserPageVO userPageVO = BeanUtil.copyProperties(user, UserPageVO.class);
+        return Result.success(userPageVO);
+    }
+
 }

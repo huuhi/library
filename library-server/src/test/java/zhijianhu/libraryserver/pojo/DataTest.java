@@ -1,4 +1,4 @@
-package zhijianhu.pojo;
+package zhijianhu.libraryserver.pojo;
 
 import org.junit.jupiter.api.Test;
 

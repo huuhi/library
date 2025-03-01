@@ -2,6 +2,7 @@ package zhijianhu.libraryserver.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,9 +25,11 @@ import java.util.List;
 public class PublishController {
     @Autowired
     private PublishService publishService;
-
     @GetMapping("/list")
+    @Cacheable(value="publishList",key="'all'")
     public Result<List<PublishVO>> list() {
+
+
         List<PublishVO> publishVOList = publishService.getPublishList();
         return Result.success(publishVOList);
     }

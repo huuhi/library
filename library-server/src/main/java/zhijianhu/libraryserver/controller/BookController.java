@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.StatusConstant;
+import zhijianhu.dto.BookDTO;
 import zhijianhu.dto.BookPageDTO;
 import zhijianhu.dto.ChangeBookStatusDTO;
 import zhijianhu.libraryserver.service.BooksService;
@@ -37,7 +38,7 @@ public class BookController {
     }
 
     @PostMapping("/add")
-    public Result addBook(@RequestBody BookVO book) {
+    public Result addBook(@RequestBody BookDTO book) {
         log.info("addBook: book={}", book);
         boolean success = bookService.addBook(book);
         return success ? Result.success() : Result.error("添加图书失败");

@@ -40,6 +40,8 @@ public class Books implements Serializable {
      */
     private Integer clazzId;
 
+
+
     /**
      * 存放地址ID
      */

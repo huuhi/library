@@ -46,6 +46,12 @@ public class UserPageVO implements Serializable {
     * 状态（1正常 0封禁）
     */
 
+    private Integer confine;
+
+    private String address;
+
+    private String cardId;
+
     private String status;
     /**
     * 性别（0未知 1男 2女）

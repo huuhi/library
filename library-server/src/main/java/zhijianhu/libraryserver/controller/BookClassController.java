@@ -2,6 +2,7 @@ package zhijianhu.libraryserver.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import zhijianhu.libraryserver.service.BookClassesService;
@@ -24,6 +25,7 @@ public class BookClassController {
     private BookClassesService bookClassesService;
 
     @GetMapping("/class")
+    @Cacheable(value = "clazz", key = "'boss'")
     public Result<List<ClazzVO>> getClazz(){
 //        获取所有的父级分类
         log.info("获取所有的父级分类");
@@ -32,7 +34,9 @@ public class BookClassController {
 
     }
 //    获取所有分类
+
     @GetMapping("/class/all")
+    @Cacheable(value = "clazz", key = "'all'")
     public Result<List<ClazzVO>> getAllClazz(){
         log.info("获取所有分类");
         List<ClazzVO> clazz= bookClassesService.getAllClazz();

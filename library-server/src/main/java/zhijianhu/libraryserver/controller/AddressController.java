@@ -2,6 +2,8 @@ package zhijianhu.libraryserver.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +27,10 @@ public class AddressController {
     @Autowired
     private StorageAddressService storageAddressService;
 
+
 //  获取所有地址信息
     @GetMapping("/get")
+    @Cacheable(value="addressList",key="'all'")
     public Result<List<AddressVO>> getAddress() {
         log.info("获取所有地址信息");
         List<AddressVO> addressVOList = storageAddressService.getAddress();

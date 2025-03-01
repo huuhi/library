@@ -29,16 +29,21 @@ public class BookVO implements Serializable {
      * 分类ID
      */
     private String clazz;
+    private Integer clazzId;
 
     /**
      * 存放地址ID
      */
     private String address;
 
+    private Integer addressId;
+
     /**
      * 出版社
      */
     private String publish;
+
+    private Integer publishId;
 
     /**
      * 国际标准书号
@@ -54,6 +59,8 @@ public class BookVO implements Serializable {
      * 1 可借 0不可借
      */
     private String status;
+
+
 
     /**
      * 出版日期

@@ -2,13 +2,17 @@ package zhijianhu.libraryserver.service.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import zhijianhu.dto.ClassPageDTO;
 import zhijianhu.entity.BookClasses;
 import zhijianhu.libraryserver.mapper.BookClassesMapper;
 import zhijianhu.libraryserver.service.BookClassesService;
+import zhijianhu.query.PageQuery;
 import zhijianhu.vo.ClazzVO;
+import zhijianhu.vo.PageVO;
 
 import java.util.*;
 
@@ -90,6 +94,35 @@ public class BookClassesServiceImpl extends ServiceImpl<BookClassesMapper, BookC
             clazzVOList.add(clazzVO);
         });
         return clazzVOList;
+    }
+
+    @Override
+    public ClazzVO getClazzById(Integer id) {
+        BookClasses clazz = getById(id);
+        ClazzVO clazzVO = BeanUtil.copyProperties(clazz, ClazzVO.class);
+        String fullPath = this.getFullPath(clazz.getId());//获取全名
+        clazzVO.setFullName(fullPath);
+        return clazzVO;
+    }
+
+    @Override
+    public PageVO<ClazzVO> getPageClazz(ClassPageDTO classPageDTO) {
+        Integer pageNum = classPageDTO.getPageNum();
+        Integer pageSize = classPageDTO.getPageSize();
+        String className = classPageDTO.getClassName();
+        PageQuery pageQuery = new PageQuery();
+        pageQuery.setPage(pageNum);
+        pageQuery.setPageSize(pageSize);
+        Page<BookClasses> mpPage = pageQuery.toMpPage();
+        Page<BookClasses> page = lambdaQuery()
+                .like(className != null, BookClasses::getName, className)
+                .page(mpPage);
+
+        return PageVO.of(page,clazz->{
+            ClazzVO clazzVO = BeanUtil.copyProperties(clazz, ClazzVO.class);
+            clazzVO.setFullName(this.getFullPath(clazz.getId()));
+            return clazzVO;
+        });
     }
 
     private void collectSubCategories(Integer currentId,

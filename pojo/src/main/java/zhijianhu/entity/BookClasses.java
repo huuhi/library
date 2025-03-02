@@ -1,6 +1,8 @@
 package zhijianhu.entity;
 
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,7 +21,7 @@ public class BookClasses implements Serializable {
     /**
     * 父分类ID
     */
-
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer parentId;
 
 

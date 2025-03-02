@@ -2,8 +2,10 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.ClassPageDTO;
 import zhijianhu.entity.BookClasses;
 import zhijianhu.vo.ClazzVO;
+import zhijianhu.vo.PageVO;
 
 import java.util.List;
 
@@ -22,4 +24,7 @@ public interface BookClassesService extends IService<BookClasses> {
 
     List<ClazzVO> getAllClazz();
 
+    ClazzVO getClazzById(Integer id);
+
+    PageVO<ClazzVO> getPageClazz(ClassPageDTO classPageDTO);
 }

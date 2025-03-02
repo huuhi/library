@@ -14,4 +14,5 @@ import java.io.Serializable;
 public class PublishVO implements Serializable {
     private Integer id;
     private String name;
+    private String address;
 }

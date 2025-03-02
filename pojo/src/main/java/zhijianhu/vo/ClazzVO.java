@@ -16,4 +16,6 @@ import java.io.Serializable;
 public class ClazzVO implements Serializable {
     private Integer id;
     private String name;
+    private Integer parentId;
+    private String fullName;//全名
 }

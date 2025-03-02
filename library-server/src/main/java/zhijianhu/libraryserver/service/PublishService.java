@@ -2,7 +2,9 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.PublishPageDTO;
 import zhijianhu.entity.Publish;
+import zhijianhu.vo.PageVO;
 import zhijianhu.vo.PublishVO;
 
 import java.util.List;
@@ -15,4 +17,6 @@ import java.util.List;
 public interface PublishService extends IService<Publish> {
 
     List<PublishVO> getPublishList();
+
+    PageVO<PublishVO> getByPage(PublishPageDTO publishPageDTO);
 }

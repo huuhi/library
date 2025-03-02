@@ -2,8 +2,10 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.AddressPageDTO;
 import zhijianhu.entity.StorageAddress;
 import zhijianhu.vo.AddressVO;
+import zhijianhu.vo.PageVO;
 
 import java.util.List;
 
@@ -17,4 +19,6 @@ public interface StorageAddressService extends IService<StorageAddress> {
 
      List<AddressVO> getAddress();
 
+
+     PageVO<AddressVO> getAddressByPage(AddressPageDTO page);
 }

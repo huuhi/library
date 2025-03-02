@@ -11,7 +11,6 @@ import java.io.Serializable;
 */
 @Data
 public class StorageAddress implements Serializable {
-
     private Integer id;
     /**
     * 地区
@@ -28,9 +27,8 @@ public class StorageAddress implements Serializable {
 
     private Integer rackLayer;
 
-    public String getAddress(){
-        return area + " " + floor + "楼 " + shelf + "架 " + rackLayer + "层";
-    }
+    private String address;
+
 
 
 }

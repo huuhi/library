@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * @author 胡志坚
@@ -43,17 +43,17 @@ public class BorrowVO implements Serializable {
 
     private String statusName;
 
-    private LocalDateTime lendTime;
+    private LocalDate lendTime;
     /**
     * 应还时间
     */
 
-    private LocalDateTime mustReturnTime;
+    private LocalDate mustReturnTime;
     /**
     * 实际还时间
     */
 
-    private LocalDateTime returnTime;
+    private LocalDate returnTime;
     /**
     * 逾期天数
     */

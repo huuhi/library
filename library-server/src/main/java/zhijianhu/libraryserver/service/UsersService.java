@@ -8,7 +8,10 @@ import zhijianhu.dto.UserPageQueryDTO;
 import zhijianhu.entity.Books;
 import zhijianhu.entity.Users;
 import zhijianhu.vo.PageVO;
+import zhijianhu.vo.UserNameAndIdVO;
 import zhijianhu.vo.UserPageVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -25,4 +28,6 @@ public interface UsersService extends IService<Users> {
     Boolean updatePassword(UserChangePasswordDTO userChangePasswordDTO);
 
     PageVO<UserPageVO> querybyPage(UserPageQueryDTO userPageQueryDTO);
+
+    List<UserNameAndIdVO> getAllUserNameAndId();
 }

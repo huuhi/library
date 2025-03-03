@@ -38,8 +38,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="BorrowRecords" />
-                  <option name="tableName" value="borrow_records" />
+                  <option name="className" value="UserQuestion" />
+                  <option name="tableName" value="user_question" />
                 </TableUIInfo>
               </list>
             </option>

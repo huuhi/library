@@ -2,6 +2,7 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.BorrowDTO;
 import zhijianhu.dto.BorrowPageDTO;
 import zhijianhu.entity.BorrowRecords;
 import zhijianhu.vo.BorrowVO;
@@ -25,4 +26,9 @@ public interface BorrowRecordsService extends IService<BorrowRecords> {
 
 
     Integer getUserBorrowCount(Integer userId);
+
+
+    Boolean updateStatus(BorrowDTO borrowDTO);
+
+    Boolean addReturnDate(Integer id);
 }

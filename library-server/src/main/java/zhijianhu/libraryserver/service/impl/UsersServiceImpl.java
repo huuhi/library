@@ -23,7 +23,10 @@ import zhijianhu.libraryserver.mapper.UsersMapper;
 import org.springframework.stereotype.Service;
 import zhijianhu.query.PageQuery;
 import zhijianhu.vo.PageVO;
+import zhijianhu.vo.UserNameAndIdVO;
 import zhijianhu.vo.UserPageVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -111,6 +114,12 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
 
             return up;
         });
+    }
+
+    @Override
+    public List<UserNameAndIdVO> getAllUserNameAndId() {
+        List<Users> list = list();
+        return BeanUtil.copyToList(list, UserNameAndIdVO.class);
     }
 }
 

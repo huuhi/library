@@ -16,9 +16,11 @@ import zhijianhu.utils.JwtUtil;
 import zhijianhu.vo.PageVO;
 import zhijianhu.vo.UserLoginVO;
 import zhijianhu.entity.Users;
+import zhijianhu.vo.UserNameAndIdVO;
 import zhijianhu.vo.UserPageVO;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author 胡志坚
@@ -106,6 +108,13 @@ public class UserController {
         Users user = usersService.getById(id);
         UserPageVO userPageVO = BeanUtil.copyProperties(user, UserPageVO.class);
         return Result.success(userPageVO);
+    }
+//    获取所有用户名称和id
+    @GetMapping("/all")
+    public Result<List<UserNameAndIdVO>> getAll(){
+        log.info("获取所有用户名称和id");
+        List<UserNameAndIdVO> userNameAndIdVOS = usersService.getAllUserNameAndId();
+        return Result.success(userNameAndIdVOS);
     }
 
 }

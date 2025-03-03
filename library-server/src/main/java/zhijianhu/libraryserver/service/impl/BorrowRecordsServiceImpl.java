@@ -5,23 +5,29 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import zhijianhu.constant.StatusConstant;
+import zhijianhu.dto.BorrowDTO;
 import zhijianhu.dto.BorrowPageDTO;
 import zhijianhu.entity.Books;
 import zhijianhu.entity.BorrowRecords;
+import zhijianhu.entity.PenaltyRecords;
 import zhijianhu.entity.Users;
 import zhijianhu.enumPojo.BorrowStatus;
 import zhijianhu.libraryserver.mapper.BooksMapper;
 import zhijianhu.libraryserver.mapper.BorrowRecordsMapper;
 import zhijianhu.libraryserver.service.BorrowRecordsService;
+import zhijianhu.libraryserver.service.PenaltyRecordsService;
 import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
 import zhijianhu.vo.BorrowVO;
 import zhijianhu.vo.PageVO;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -37,12 +43,16 @@ import java.util.stream.Collectors;
 * @createDate 2025-03-01 13:45:52
 */
 @Service
+@Slf4j
 public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, BorrowRecords>
     implements BorrowRecordsService {
     @Autowired
     private BooksMapper booksService;
     @Autowired
     private UsersService usersService;
+    @Autowired
+    private PenaltyRecordsService penaltyRecordsService;
+
 
     @Override
     public boolean deleteBorrowRecord(Integer bookId, Integer userId) {
@@ -53,7 +63,7 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
                 .eq(BorrowRecords::getStatus,StatusConstant.ENABLE)
                 .one();
         one.setStatus(StatusConstant.DISABLE);
-        one.setReturnTime(LocalDateTime.now());
+        one.setReturnTime(LocalDate.now());
         return updateById(one);
     }
 
@@ -62,7 +72,7 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
         //添加借阅信息
         Books book = booksService.selectById(id);
         String image = book.getImage();
-        LocalDateTime mustReturnTime = LocalDateTime.now().plusDays(30);//借书期限30天
+        LocalDate mustReturnTime = LocalDate.now().plusDays(30);//借书期限30天
         BorrowRecords record = BorrowRecords
                 .builder()
                 .bookId(id)
@@ -154,6 +164,57 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
                 .eq(BorrowRecords::getUserId, userId)
                 .count();
         return  count.intValue();
+    }
+
+    @Override
+    public Boolean updateStatus(BorrowDTO borrow) {
+//        先根据id获取借阅信息
+        Integer id = borrow.getId();
+        Integer status = borrow.getStatus();
+        BorrowRecords record = getById(id);
+        record.setStatus(status);
+//        id和status不能为null，其他字段可以为null
+        String note = borrow.getNote();
+        BigDecimal penaltyAmount = borrow.getPenaltyAmount();
+        String violationReason = borrow.getViolationReason();
+//        判断是否为null
+
+
+        if(note!= null){
+            record.setNote(note);
+        }
+        if(penaltyAmount != null){
+//            说明需要罚款
+            PenaltyRecords penaltyRecord = PenaltyRecords.builder()
+                    .borrowRecordId(id)
+                    .userId(record.getUserId())
+                    .penaltyAmount(penaltyAmount)
+                    .bookId(record.getBookId())
+                    .build();
+            boolean save = penaltyRecordsService.save(penaltyRecord);
+            log.info("添加罚款记录：{},成功？：{}", penaltyRecord, save);
+            record.setPenaltyAmount(penaltyAmount);
+        }
+        if(violationReason!=null){
+            record.setViolationReason(violationReason);
+        }
+        return updateById(record);
+    }
+
+    @Override
+    public Boolean addReturnDate(Integer id) {
+        BorrowRecords record = getById(id);
+        LocalDate mustReturnTime = record.getMustReturnTime();
+        LocalDate lendTime = record.getLendTime();
+//        计算差值
+        long days = mustReturnTime.toEpochDay() - lendTime.toEpochDay();
+//        如果小于30，则可以续借
+        if(days<=30){
+            LocalDate localDateTime = mustReturnTime.plusDays(15);//续借15天
+            record.setMustReturnTime(localDateTime);
+            return updateById(record);
+        }
+        return false;
     }
 //
 

@@ -45,7 +45,7 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public Result<BookVO> getBookById( @PathVariable Integer id) {
+    public Result<BookVO> getBookById(@PathVariable Integer id) {
         log.info("getBookById: id={}", id);
         BookVO book = bookService.getBookById(id);
         return book != null ? Result.success(book) : Result.error("图书不存在");

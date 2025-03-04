@@ -26,7 +26,9 @@ import zhijianhu.vo.PageVO;
 import zhijianhu.vo.UserNameAndIdVO;
 import zhijianhu.vo.UserPageVO;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
 * @author windows
@@ -59,6 +61,10 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         if(user.getStatus()== StatusConstant.DISABLE){
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
+
+//        如果可以到这里说明用户登录成功
+        user.setLastLogin(LocalDateTime.now());
+        updateById(user);
         return user;
     }
 
@@ -120,6 +126,24 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     public List<UserNameAndIdVO> getAllUserNameAndId() {
         List<Users> list = list();
         return BeanUtil.copyToList(list, UserNameAndIdVO.class);
+    }
+
+    @Override
+    public Boolean updateConfine(Integer confine, Integer id) {
+        Users user = getById(id);
+        user.setConfine(confine);
+        return updateById(user);
+    }
+
+    @Override
+    public boolean updateStatus(Integer status, Integer id, String violationReason) {
+        Users user = getById(id);
+        user.setStatus(status);
+        if(Objects.equals(status, StatusConstant.DISABLE)){
+            log.info("封禁用户：{}",id);
+            user.setViolationReason(violationReason);
+        }
+        return updateById(user);
     }
 }
 

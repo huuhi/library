@@ -3,7 +3,11 @@ package zhijianhu.libraryserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import zhijianhu.dto.AddUserQuestionDTO;
+import zhijianhu.dto.QuestionWorkOutDTO;
+import zhijianhu.dto.UserQuestionPageDTO;
 import zhijianhu.entity.UserQuestion;
+import zhijianhu.vo.PageVO;
+import zhijianhu.vo.UserQuestionPageVO;
 
 /**
 * @author windows
@@ -14,4 +18,10 @@ public interface UserQuestionService extends IService<UserQuestion> {
 
     boolean addUserQuestion(AddUserQuestionDTO dto);
     boolean isExist(Integer userId,Integer borrowRecordId);
+
+    PageVO<UserQuestionPageVO> getUserQuestionList(UserQuestionPageDTO dto);
+
+    boolean handleUserQuestion(QuestionWorkOutDTO dto);
+
+    UserQuestionPageVO getUserQuestion(Integer id);
 }

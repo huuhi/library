@@ -45,6 +45,8 @@ public class UserController {
         String image = user.getImage();
         HashMap<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
+        claims.put(JwtClaimsConstant.USERNAME,user.getUsername());
+        claims.put(JwtClaimsConstant.USER_IMAGE,image);
         String token = JwtUtil.createJWT(
                 JwtProperties.getUserTtl(),
                 claims);
@@ -61,14 +63,14 @@ public class UserController {
 
 //   用户注册
     @PostMapping("/register")
-    public Result register(@RequestBody UserDTO userDTO) {
+    public Result<Void> register(@RequestBody UserDTO userDTO) {
         log.info("用户注册：{}", userDTO);
         boolean result = usersService.register(userDTO);
         return result?Result.success():Result.error("注册失败");
     }
 //    修改用户信息
     @PutMapping
-    public Result update(@RequestBody UserDTO userDTO){
+    public Result<Void> update(@RequestBody UserDTO userDTO){
         log.info("修改用户信息：{}", userDTO);
         Users users = BeanUtil.copyProperties(userDTO, Users.class);
         boolean b = usersService.updateById(users);
@@ -76,19 +78,16 @@ public class UserController {
     }
 //   修改状态
     @PutMapping("/status/{status}")
-    public Result updateStatus(@PathVariable("status") Integer status,
+    public Result<Void> updateStatus(@PathVariable("status") Integer status,
                                @RequestParam("id") Integer id,
-                               @RequestParam("violationReason") String violationReason){
+                               @RequestParam(value = "violationReason" , required = false) String violationReason){
         log.info("修改用户状态：{}", status);
-        Users user = usersService.getById(id);
-        user.setStatus(status);
-        user.setViolationReason(violationReason);
-        boolean b = usersService.updateById(user);
+        boolean b= usersService.updateStatus(status,id,violationReason);
         return b?Result.success():Result.error("修改失败");
     }
 //    修改密码
     @PutMapping("/password")
-    public Result updatePassword(@RequestBody UserChangePasswordDTO userChangePasswordDTO){
+    public Result<Void> updatePassword(@RequestBody UserChangePasswordDTO userChangePasswordDTO){
         log.info("修改用户密码：{}",userChangePasswordDTO.getId());
         Boolean b= usersService.updatePassword(userChangePasswordDTO);
         return b?Result.success():Result.error("修改失败");
@@ -115,6 +114,13 @@ public class UserController {
         log.info("获取所有用户名称和id");
         List<UserNameAndIdVO> userNameAndIdVOS = usersService.getAllUserNameAndId();
         return Result.success(userNameAndIdVOS);
+    }
+//    修改用户借书上限
+    @PutMapping("/confine/{confine}")
+    public Result<Void> updateConfine(@PathVariable("confine") Integer confine,
+                               @RequestParam("id") Integer id){
+        Boolean success= usersService.updateConfine(confine,id);
+        return success?Result.success():Result.error("修改失败");
     }
 
 }

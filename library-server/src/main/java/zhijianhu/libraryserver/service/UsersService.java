@@ -30,4 +30,8 @@ public interface UsersService extends IService<Users> {
     PageVO<UserPageVO> querybyPage(UserPageQueryDTO userPageQueryDTO);
 
     List<UserNameAndIdVO> getAllUserNameAndId();
+
+    Boolean updateConfine(Integer confine, Integer id);
+
+    boolean updateStatus(Integer status, Integer id, String violationReason);
 }

@@ -1,27 +1,18 @@
-package zhijianhu.entity;
-
-
+package zhijianhu.vo;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 import java.time.LocalDateTime;
-import java.util.Date;
-
 
 /**
-* 
-* @TableName user_question
-*/
+ * @author 胡志坚
+ * @version 1.0
+ * 创造日期 2025/3/4
+ * 说明:
+ */
 @Data
-public class UserQuestion implements Serializable {
-
-    /**
-    * 
-    */
-
-    private Integer id;
+public class UserQuestionPageVO {
+     private Integer id;
     /**
     * 用户ID
     */
@@ -37,11 +28,15 @@ public class UserQuestion implements Serializable {
     */
 
     private Integer appealType;
+
+    private String appealTypeName;
     /**
     * 0=待处理 1=已解决
     */
 
     private Integer status;
+
+    private String statusName;
     /**
     * 处理人ID
     */
@@ -64,7 +59,5 @@ public class UserQuestion implements Serializable {
     private LocalDateTime createTime;
 
     private LocalDateTime endTime;
-
-
 
 }

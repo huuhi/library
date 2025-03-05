@@ -7,20 +7,31 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.AddUserQuestionDTO;
 import zhijianhu.dto.QuestionWorkOutDTO;
 import zhijianhu.dto.UserQuestionPageDTO;
 import zhijianhu.entity.UserQuestion;
+import zhijianhu.entity.Users;
+import zhijianhu.enumPojo.IsRead;
 import zhijianhu.enumPojo.QuestionType;
 import zhijianhu.enumPojo.StatusType;
 import zhijianhu.libraryserver.mapper.UserQuestionMapper;
 import zhijianhu.libraryserver.service.UserQuestionService;
+import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
 import zhijianhu.vo.PageVO;
 import zhijianhu.vo.UserPageVO;
 import zhijianhu.vo.UserQuestionPageVO;
+import zhijianhu.vo.UserQuestionVO;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
 * @author windows
@@ -30,8 +41,8 @@ import java.time.LocalDateTime;
 @Service
 public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, UserQuestion>
     implements UserQuestionService {
-
-
+    @Autowired
+    private UsersService userService;
 
 
     @Override
@@ -50,6 +61,7 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
         return one != null;
     }
 
+//    分页获取用户的反馈记录
     @Override
     public PageVO<UserQuestionPageVO> getUserQuestionList(UserQuestionPageDTO dto) {
         Integer pageNum = dto.getPageNum();
@@ -67,6 +79,7 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
         return PageVO.of(page, this::getUserQuestionPageVO);
     }
 
+//    解决用户问题
     @Override
     public boolean handleUserQuestion(QuestionWorkOutDTO dto) {
         Integer id = dto.getId();
@@ -75,13 +88,66 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
         question.setManagerId(dto.getManagerId());
         question.setProcessNote(dto.getProcessNote());
         question.setEndTime(LocalDateTime.now());
+        question.setIsReadStatus(StatusConstant.ENABLE);
         return updateById(question);
     }
 
     @Override
     public UserQuestionPageVO getUserQuestion(Integer id) {
         UserQuestion question = getById(id);
-        return getUserQuestionPageVO(question);
+        Integer managerId = question.getManagerId();
+        String managerName = null;
+        if(managerId!=null){
+            managerName= userService.getById(managerId).getName();
+        }
+        UserQuestionPageVO userQuestionPageVO = getUserQuestionPageVO(question);
+        userQuestionPageVO.setManagerName(managerName);
+        return userQuestionPageVO;
+    }
+
+    @Override
+    public Integer countUnread(Integer id) {
+        return lambdaQuery()
+                .eq(UserQuestion::getUserId, id)
+                .eq(UserQuestion::getIsReadStatus, StatusConstant.ENABLE)
+                .count().intValue();
+    }
+
+    @Override
+    public List<UserQuestionVO> getUserQuestionByUserId(Integer id) {
+        List<UserQuestion> list = lambdaQuery()
+                .eq(UserQuestion::getUserId, id)
+                .list();
+        if(list.isEmpty()){
+            return List.of();
+        }
+        List<UserQuestionVO> userQuestionVOS = BeanUtil.copyToList(list, UserQuestionVO.class);
+//        批量获取管理员的非null id 并且转换成set集合
+        Set<Integer> collect = userQuestionVOS.stream()
+                .map(UserQuestionVO::getManagerId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+//        批量获取管理员的username 并转换成map
+        Map<Integer, String> managerMap = userService.listByIds(collect)
+                .stream()
+                .collect(Collectors.toMap(Users::getId, Users::getUsername));
+
+        userQuestionVOS.forEach(question->{
+//           获取   appealTypeName,  statusName, managerName, isRead
+            Integer managerId = question.getManagerId();
+            if(managerId != null && managerMap.containsKey(managerId)){
+                question.setManagerName(managerMap.get(managerId));
+            }
+            toUserQuestionVO(question);
+
+        });
+//        根据用户id查询反馈列表，说明用户在查看消息，这个时候需要将未读的消息设置为已读
+        lambdaUpdate()
+                .eq(UserQuestion::getUserId,id)
+                .eq(UserQuestion::getIsReadStatus,StatusConstant.ENABLE)
+                .set(UserQuestion::getIsReadStatus,StatusConstant.DISABLE)
+                .update();
+        return userQuestionVOS;
     }
 
     private UserQuestionPageVO getUserQuestionPageVO(UserQuestion question) {
@@ -92,6 +158,16 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
         userQuestionPageVO.setStatusName(statusName);
         return userQuestionPageVO;
     }
+    private void toUserQuestionVO(UserQuestionVO question) {
+        Integer type = question.getAppealType();
+        question.setAppealTypeName(QuestionType.getNameByCode(type));
+        Integer status = question.getStatus();
+        question.setStatusName(StatusType.getNameByCode(status));
+        Integer isRead = question.getIsReadStatus();
+        question.setIsRead(IsRead.getIsReadByCode(isRead));
+    }
+
+
 }
 
 

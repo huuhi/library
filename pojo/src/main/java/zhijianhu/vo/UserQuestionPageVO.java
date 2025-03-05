@@ -42,6 +42,8 @@ public class UserQuestionPageVO {
     */
 
     private Integer managerId;
+
+    private String managerName;
     /**
     * 用户提交的简要描述
     */

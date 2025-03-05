@@ -8,6 +8,9 @@ import zhijianhu.dto.UserQuestionPageDTO;
 import zhijianhu.entity.UserQuestion;
 import zhijianhu.vo.PageVO;
 import zhijianhu.vo.UserQuestionPageVO;
+import zhijianhu.vo.UserQuestionVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -24,4 +27,8 @@ public interface UserQuestionService extends IService<UserQuestion> {
     boolean handleUserQuestion(QuestionWorkOutDTO dto);
 
     UserQuestionPageVO getUserQuestion(Integer id);
+
+    Integer countUnread(Integer id);
+
+    List<UserQuestionVO> getUserQuestionByUserId(Integer id);
 }

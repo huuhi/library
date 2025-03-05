@@ -38,7 +38,7 @@ public class BookController {
     }
 
     @PostMapping("/add")
-    public Result addBook(@RequestBody BookDTO book) {
+    public Result<Void> addBook(@RequestBody BookDTO book) {
         log.info("addBook: book={}", book);
         boolean success = bookService.addBook(book);
         return success ? Result.success() : Result.error("添加图书失败");
@@ -52,14 +52,14 @@ public class BookController {
     }
 
     @PutMapping("/change")
-    public Result changeBook(@RequestBody BookVO book) {
+    public Result<Void> changeBook(@RequestBody BookVO book) {
        boolean success =  bookService.changeBook(book);
        return success ? Result.success() : Result.error("修改图书失败");
     }
 //    借书 以及 还书
     @PutMapping("/status")
-    public Result changeBookStatus(@RequestBody ChangeBookStatusDTO dto) {
-        if(dto.getStatus() == StatusConstant.DISABLE){
+    public Result<Void> changeBookStatus(@RequestBody ChangeBookStatusDTO dto) {
+        if(Objects.equals(dto.getStatus(), StatusConstant.DISABLE)){
             log.info("借书：{}",dto);
         }else{
             log.info("还书：{}",dto);
@@ -68,7 +68,7 @@ public class BookController {
         return success ? Result.success() : Result.error("修改图书状态失败");
     }
     @DeleteMapping("/{id}")
-    public Result deleteBook(@PathVariable("id") List<Integer> ids) {
+    public Result<Void> deleteBook(@PathVariable("id") List<Integer> ids) {
         log.info("deleteBook: id={}", ids);
         boolean b = bookService.removeBatchByIds(ids);
         return b ? Result.success() : Result.error("删除图书失败");

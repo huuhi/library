@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -173,13 +174,19 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
         Integer status = borrow.getStatus();
         BorrowRecords record = getById(id);
         record.setStatus(status);
+//        如果状态等于0，说明管理员主动归还，则需要更新归还时间和书籍状态
+        if(Objects.equals(status, StatusConstant.DISABLE)){
+            record.setReturnTime(LocalDate.now());
+            Integer bookId = record.getBookId();
+            Books books = booksService.selectById(bookId);
+            books.setStatus(StatusConstant.ENABLE);
+            booksService.updateById(books);
+        }
 //        id和status不能为null，其他字段可以为null
         String note = borrow.getNote();
         BigDecimal penaltyAmount = borrow.getPenaltyAmount();
         String violationReason = borrow.getViolationReason();
 //        判断是否为null
-
-
         if(note!= null){
             record.setNote(note);
         }

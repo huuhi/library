@@ -12,6 +12,7 @@ import zhijianhu.libraryserver.service.UserQuestionService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.PageVO;
 import zhijianhu.vo.UserQuestionPageVO;
+import zhijianhu.vo.UserQuestionVO;
 
 import java.util.List;
 
@@ -65,5 +66,18 @@ public class UserQuestionController {
         log.info("删除用户的问题：{}", ids);
         boolean success= userQuestionService.removeBatchByIds(ids);
         return success? Result.success() : Result.error(MessageConstant.DELETE_FAIL);
+    }
+    @GetMapping("/getCount/{userId}")
+    public Result<Integer> getCount(@PathVariable("userId") Integer id) {
+        log.info("查询用户的问题数量：{}", id);
+//      返回用户未读消息数量
+        return Result.success(userQuestionService.countUnread(id));
+    }
+//    根据用户id获取用户的反馈问题
+    @GetMapping("/getUserQuestion/{userid}")
+    public Result<List<UserQuestionVO>> getUserQuestionByUserId(@PathVariable("userid") Integer id) {
+        log.info("根据用户id获取用户的反馈问题：{}",id);
+        List<UserQuestionVO> userQuestion = userQuestionService.getUserQuestionByUserId(id);
+        return Result.success(userQuestion);
     }
 }

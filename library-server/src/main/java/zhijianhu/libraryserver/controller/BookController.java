@@ -59,6 +59,7 @@ public class BookController {
 //    借书 以及 还书
     @PutMapping("/status")
     public Result<Void> changeBookStatus(@RequestBody ChangeBookStatusDTO dto) {
+//        TODO : 这里借阅的状态可能是2，因为违规未还是可以还书的
         if(Objects.equals(dto.getStatus(), StatusConstant.DISABLE)){
             log.info("借书：{}",dto);
         }else{

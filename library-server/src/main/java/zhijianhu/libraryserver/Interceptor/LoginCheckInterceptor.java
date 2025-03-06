@@ -27,33 +27,40 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     @Override
     //在请求处理之前调用，返回 true 表示继续处理，返回 false 表示中断处理。
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //需要登录，检查是否登录
+           // 处理OPTIONS预检请求
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
+            response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, token");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.setStatus(HttpServletResponse.SC_OK); // 直接返回200
+            return false; // 不继续处理
+        }
+
+        // 其他请求处理逻辑
         String jwt = request.getHeader("token");
-        if(jwt == null || jwt.isEmpty()){
-            //未登录，重定向到登录页面
-            log.info("未登录，重定向到登录页面");
-            Result res = Result.error("NOT_LOGIN");
-            //转换json
-            String json = JSONObject.toJSONString(res); //将对象转换为json字符串
-            response.getWriter().write(json);//响应json数据给前端
+        if (jwt == null || jwt.isEmpty()) {
+            Result<Void> res = Result.error("NOT_LOGIN");
+            String json = JSONObject.toJSONString(res);
+            response.getWriter().write(json);
             return false;
         }
-        //如果存在就解析
+
         try {
             Claims claims = JwtUtil.parseJWT(jwt);
-             Integer id = (Integer)claims.get(JwtClaimsConstant.USER_ID);
-            log.info("登录成功，用户id为："+id);
+            Integer id = (Integer) claims.get(JwtClaimsConstant.USER_ID);
+            log.info("登录成功，用户id为：" + id);
         } catch (Exception e) {
-            log.info("解析jwt失败");
-            //解析失败，重定向到登录页面
-            Result res = Result.error("NOT_LOGIN");
-            //转换json
-            String json = JSONObject.toJSONString(res); //将对象转换为json字符串
-            response.getWriter().write(json);//响应json数据给前端
+            Result<Void> res = Result.error("NOT_LOGIN");
+            String json = JSONObject.toJSONString(res);
+            response.getWriter().write(json);
             return false;
         }
-        //登录成功，放行
-        log.info("登录成功，放行");
+
+        // 设置CORS头
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
         return true;
     }
 

@@ -9,7 +9,7 @@ import com.aliyun.green20220302.Client;
 
 public class TextModerationPlusDemo {
 
-    public static String DetectionText(String msg) throws Exception {
+    public static String DetectionText(String msg) {
         Config config = new Config();
 
         config.setAccessKeyId(System.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID"));
@@ -25,7 +25,12 @@ public class TextModerationPlusDemo {
         //config.setHttpProxy("http://xx.xx.xx.xx:xxxx");
         //设置https代理。
 //        config.setHttpsProxy("https://xx.xx.xx.xx:xxxx");
-        Client client = new Client(config);
+        Client client = null;
+        try {
+            client = new Client(config);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         JSONObject serviceParameters = new JSONObject();
         serviceParameters.put("content", msg);

@@ -2,7 +2,11 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.ReviewDTO;
 import zhijianhu.entity.Review;
+import zhijianhu.vo.ReviewVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -11,4 +15,7 @@ import zhijianhu.entity.Review;
 */
 public interface ReviewService extends IService<Review> {
 
+    Boolean sendReview(ReviewDTO reviewDTO);
+
+    List<ReviewVO> getReviewByBookId(Integer bookId, Integer userId);
 }

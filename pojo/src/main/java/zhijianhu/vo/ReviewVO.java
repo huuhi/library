@@ -1,38 +1,30 @@
-package zhijianhu.entity;
-
-
+package zhijianhu.vo;
 
 import lombok.Data;
 
-import java.io.Serializable;
-
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
-* 图书评论表
-* @TableName review
-*/
+ * @author 胡志坚
+ * @version 1.0
+ * 创造日期 2025/3/6
+ * 说明:
+ */
 @Data
-public class Review implements Serializable {
-
-    /**
-    * 
-    */
-
-    private Integer id;
+public class ReviewVO {
+     private Integer id;
     /**
     * 用户id
     */
 
     private Integer userId;
-
-    private String image;
+    private String userName;
 
     /**
     * 评论内容
     */
 
+    private String image;
     private String content;
     /**
     * 图书id
@@ -45,9 +37,8 @@ public class Review implements Serializable {
 
     private LocalDateTime createTime;
 
-    private Integer isAudit;
+    //当前用户是否点赞
+    private Boolean isLike;
 
     private Integer likeCount;
-
-
 }

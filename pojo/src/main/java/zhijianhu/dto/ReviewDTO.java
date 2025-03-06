@@ -17,7 +17,4 @@ public class ReviewDTO {
     * 图书id
     */
     private Integer bookId;
-    /**
-    * 评论时间
-    */
 }

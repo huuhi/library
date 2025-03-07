@@ -2,6 +2,8 @@ package zhijianhu.libraryserver.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.AddUserQuestionDTO;
@@ -31,6 +33,7 @@ public class UserQuestionController {
     private UserQuestionService userQuestionService;
 
     @PostMapping("/add")
+    @CacheEvict(value = "userQuestion", allEntries = true)
     public Result<Void> addUserQuestion(@RequestBody AddUserQuestionDTO dto) {
         log.info("用户反馈问题：{}", dto);
         boolean exist = userQuestionService.isExist(dto.getUserId(), dto.getBorrowRecordId());
@@ -50,6 +53,7 @@ public class UserQuestionController {
     }
 //    管理员处理用户的问题
     @PostMapping("/workOut")
+    @CacheEvict(value = "userQuestion", allEntries = true)
     public Result<Void> adminDealUserQuestion(@RequestBody QuestionWorkOutDTO dto) {
         log.info("管理员处理用户的问题：{}", dto);
         boolean success= userQuestionService.handleUserQuestion(dto);
@@ -75,6 +79,7 @@ public class UserQuestionController {
     }
 //    根据用户id获取用户的反馈问题
     @GetMapping("/getUserQuestion/{userid}")
+    @Cacheable(value = "userQuestion", key = "#id")
     public Result<List<UserQuestionVO>> getUserQuestionByUserId(@PathVariable("userid") Integer id) {
         log.info("根据用户id获取用户的反馈问题：{}",id);
         List<UserQuestionVO> userQuestion = userQuestionService.getUserQuestionByUserId(id);

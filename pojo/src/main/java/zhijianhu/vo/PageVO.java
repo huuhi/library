@@ -6,6 +6,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  * 说明:分页查询结果
  */
 @Data
-public class PageVO<T> {
+public class PageVO<T> implements Serializable {
     private Long total;
     private List<T> records;
 

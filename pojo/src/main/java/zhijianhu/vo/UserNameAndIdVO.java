@@ -2,6 +2,8 @@ package zhijianhu.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author 胡志坚
  * @version 1.0
@@ -9,7 +11,7 @@ import lombok.Data;
  * 说明:
  */
 @Data
-public class UserNameAndIdVO {
+public class UserNameAndIdVO implements Serializable {
     private Integer id;
     private String username;
 }

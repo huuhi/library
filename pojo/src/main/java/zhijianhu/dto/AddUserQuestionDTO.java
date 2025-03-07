@@ -2,6 +2,8 @@ package zhijianhu.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author 胡志坚
  * @version 1.0
@@ -9,7 +11,7 @@ import lombok.Data;
  * 说明:
  */
 @Data
-public class AddUserQuestionDTO {
+public class AddUserQuestionDTO implements Serializable {
     private Integer userId;
     private Integer borrowRecordId;
     private Short questionType;

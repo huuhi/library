@@ -10,4 +10,8 @@ public class StatusConstant {
 
     //禁用
     public static final Integer DISABLE = 0;
+
+//    违规
+    public static final Integer ILLEGAL = 2;
+
 }

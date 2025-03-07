@@ -58,7 +58,7 @@ public class AddressController {
 //    修改地址
     @PostMapping("/update")
     @CacheEvict(value="addressList",allEntries=true)
-    public Result updateAddress(@RequestBody StorageAddress address) {
+    public Result<Void> updateAddress(@RequestBody StorageAddress address) {
         boolean save = storageAddressService.updateById(address);
         return save? Result.success(): Result.error("修改失败");
     }

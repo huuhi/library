@@ -2,6 +2,7 @@ package zhijianhu.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
  * 说明:
  */
 @Data
-public class PenaltyRecordVO {
+public class PenaltyRecordVO implements Serializable {
     private Integer id;
     /**
     * 用户id

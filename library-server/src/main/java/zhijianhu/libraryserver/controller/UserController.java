@@ -3,12 +3,15 @@ package zhijianhu.libraryserver.controller;
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.JwtClaimsConstant;
 import zhijianhu.dto.UserChangePasswordDTO;
 import zhijianhu.dto.UserDTO;
 import zhijianhu.dto.UserLoginDTO;
 import zhijianhu.dto.UserPageQueryDTO;
+import zhijianhu.entity.UserContext;
 import zhijianhu.properties.JwtProperties;
 import zhijianhu.result.Result;
 import zhijianhu.libraryserver.service.UsersService;
@@ -63,6 +66,7 @@ public class UserController {
 
 //   用户注册
     @PostMapping("/register")
+    @CacheEvict(value = "userNameAndId" , key = "'all'")
     public Result<Void> register(@RequestBody UserDTO userDTO) {
         log.info("用户注册：{}", userDTO);
         boolean result = usersService.register(userDTO);
@@ -70,6 +74,7 @@ public class UserController {
     }
 //    修改用户信息
     @PutMapping
+    @CacheEvict(value = "userNameAndId" , key = "'all'")
     public Result<Void> update(@RequestBody UserDTO userDTO){
         log.info("修改用户信息：{}", userDTO);
         Users users = BeanUtil.copyProperties(userDTO, Users.class);
@@ -110,6 +115,7 @@ public class UserController {
     }
 //    获取所有用户名称和id
     @GetMapping("/all")
+    @Cacheable(value = "userNameAndId" , key = "'all'")
     public Result<List<UserNameAndIdVO>> getAll(){
         log.info("获取所有用户名称和id");
         List<UserNameAndIdVO> userNameAndIdVOS = usersService.getAllUserNameAndId();
@@ -121,6 +127,13 @@ public class UserController {
                                @RequestParam("id") Integer id){
         Boolean success= usersService.updateConfine(confine,id);
         return success?Result.success():Result.error("修改失败");
+    }
+//    用户退出登录应该删除用户id
+    @PutMapping("/exit/{id}")
+    public Result<Void> exit(@PathVariable("id") Integer id){
+        log.info("用户退出登录：{}",id);
+        UserContext.clear();//清除用户id
+        return Result.success();
     }
 
 }

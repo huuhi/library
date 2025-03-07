@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import zhijianhu.constant.JwtClaimsConstant;
+import zhijianhu.entity.UserContext;
 import zhijianhu.result.Result;
 import zhijianhu.utils.JwtUtil;
 
@@ -49,6 +50,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         try {
             Claims claims = JwtUtil.parseJWT(jwt);
             Integer id = (Integer) claims.get(JwtClaimsConstant.USER_ID);
+            UserContext.setUserId(id);// 设置用户id到线程变量中
             log.info("登录成功，用户id为：" + id);
         } catch (Exception e) {
             Result<Void> res = Result.error("NOT_LOGIN");
@@ -63,7 +65,4 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 
         return true;
     }
-
-    //在请求处理之后调用，但是在视图被渲染之前（Controller方法调用之后），
-    // 也就是说在这个方法中对ModelAndView对象进行操作，可以对ModelAndView对象进行设置。
 }

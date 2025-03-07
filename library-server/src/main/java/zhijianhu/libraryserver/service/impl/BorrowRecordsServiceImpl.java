@@ -61,7 +61,11 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
         BorrowRecords one = lambdaQuery()
                 .eq(BorrowRecords::getUserId, userId)
                 .eq(BorrowRecords::getBookId, bookId)
-                .eq(BorrowRecords::getStatus,StatusConstant.ENABLE)
+//                没有还书的
+                .eq(BorrowRecords::getStatus, StatusConstant.ENABLE)
+                .or()
+//                违规未还的
+                .eq(BorrowRecords::getStatus, StatusConstant.ILLEGAL)
                 .one();
         one.setStatus(StatusConstant.DISABLE);
         one.setReturnTime(LocalDate.now());
@@ -70,6 +74,12 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
 
     @Override
     public boolean addBorrowRecord(Integer id, Integer userId) {
+        Integer borrowCount = getBorrowCount(userId);
+        Integer confine = usersService.getById(userId).getConfine();
+//        当前借阅数量大于等于限制数量，则不能借阅
+        if(borrowCount >= confine){
+            return false;
+        }
         //添加借阅信息
         Books book = booksService.selectById(id);
         String image = book.getImage();

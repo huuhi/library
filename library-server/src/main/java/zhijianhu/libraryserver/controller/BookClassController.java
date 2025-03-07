@@ -37,7 +37,6 @@ public class BookClassController {
         log.info("获取所有的父级分类");
         List<ClazzVO> clazz= bookClassesService.getBossClazz();
         return Result.success(clazz);
-
     }
 //    获取所有分类
     @GetMapping("/all")

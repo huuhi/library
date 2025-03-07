@@ -37,13 +37,13 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="ReviewLike" />
-                  <option name="tableName" value="review_like" />
+                  <option name="className" value="AuditLog" />
+                  <option name="tableName" value="audit_log" />
                 </TableUIInfo>
               </list>
             </option>
             <option name="templatesName" value="custom-model-swagger" />
-            <option name="useActualColumns" value="true" />
+            <option name="useLombokPlugin" value="true" />
           </GenerateConfig>
         </option>
         <option name="moduleName" value="library-server" />

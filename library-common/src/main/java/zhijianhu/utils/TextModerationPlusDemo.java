@@ -1,15 +1,22 @@
 package zhijianhu.utils;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.green20220302.models.TextModerationPlusRequest;
 import com.aliyun.green20220302.models.TextModerationPlusResponse;
 import com.aliyun.green20220302.models.TextModerationPlusResponseBody;
 import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.green20220302.Client;
+import lombok.extern.slf4j.Slf4j;
+import zhijianhu.result.TextResult;
 
+import java.util.List;
+
+
+@Slf4j
 public class TextModerationPlusDemo {
 
-    public static String DetectionText(String msg) {
+    public static TextResult DetectionText(String msg) {
         Config config = new Config();
 
         config.setAccessKeyId(System.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID"));
@@ -47,7 +54,11 @@ public class TextModerationPlusDemo {
                 Integer code = result.getCode();
                 if (200 == code) {
                     TextModerationPlusResponseBody.TextModerationPlusResponseBodyData data = result.getData();
-                    return data.getRiskLevel();//直接返回风险等级
+                    List<TextModerationPlusResponseBody.TextModerationPlusResponseBodyDataResult> result1 = data.getResult();
+                    String description = result1.get(0).getDescription();
+                    return TextResult.builder()
+                            .level(data.getRiskLevel())
+                            .text(description).build(); //直接返回风险等级
                 } else {
                     System.out.println("text moderation not success. code:" + code);
                 }

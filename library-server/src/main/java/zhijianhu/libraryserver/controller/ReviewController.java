@@ -3,13 +3,17 @@ package zhijianhu.libraryserver.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import zhijianhu.dto.ExamineReviewDTO;
 import zhijianhu.dto.ReviewDTO;
-import zhijianhu.entity.Review;
+import zhijianhu.dto.ReviewPageDTO;
 import zhijianhu.libraryserver.service.ReviewService;
 import zhijianhu.result.Result;
+import zhijianhu.vo.PageVO;
+import zhijianhu.vo.ReviewPageVO;
 import zhijianhu.vo.ReviewVO;
 
 import java.util.List;
+
 
 /**
  * @author 胡志坚
@@ -24,7 +28,7 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 //    发表评论
-@PostMapping("/send")
+    @PostMapping("/send")
     public Result<Void> sendReview(@RequestBody ReviewDTO reviewDTO){
         log.info("发表评论:{}", reviewDTO);
         Boolean  success= reviewService.sendReview(reviewDTO);
@@ -37,10 +41,26 @@ public class ReviewController {
         List<ReviewVO> reviewList = reviewService.getReviewByBookId(bookId,userId);
         return Result.success(reviewList);
     }
+//    下面的真正删除评论，而不是逻辑删除
     @DeleteMapping("/delete/{id}")
     public Result<Void> deleteReview(@PathVariable("id") Integer id){
         log.info("删除评论:{}", id);
-        boolean delete= reviewService.removeById(id);
+        boolean delete= reviewService.completeRemove(id);
         return delete? Result.success() : Result.error("删除评论失败");
     }
+//    管理员审核评论
+    @PutMapping("/audit")
+    public Result<Void> auditReview(@RequestBody ExamineReviewDTO reviewDTO){
+        log.info("审核评论:{}", reviewDTO);
+        boolean success= reviewService.auditReview(reviewDTO);
+        return success? Result.success() : Result.error("审核评论失败");
+    }
+//    分页查询评论
+    @GetMapping("/page")
+    public Result<PageVO<ReviewPageVO>> getReviewByPage(@ModelAttribute ReviewPageDTO reviewPageDTO){
+        log.info("分页查询评论:{}", reviewPageDTO);
+        PageVO<ReviewPageVO> pageVO = reviewService.getReviewByPage(reviewPageDTO);
+        return Result.success(pageVO);
+    }
+
 }

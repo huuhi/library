@@ -2,6 +2,7 @@ package zhijianhu.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
  * 说明:
  */
 @Data
-public class BorrowDTO {
+public class BorrowDTO implements Serializable {
     private Integer id;
     private Integer status;
     /**

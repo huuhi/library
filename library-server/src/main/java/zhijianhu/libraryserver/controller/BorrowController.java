@@ -31,7 +31,7 @@ public class BorrowController {
 //    分页获取所有借阅记录
     @GetMapping
 //    @Cacheable(value = "borrowList", key = "'borrowList'")
-    public Result<PageVO<BorrowVO>> borrow(BorrowPageDTO borrowPageDTO){
+    public Result<PageVO<BorrowVO>> borrow(@ModelAttribute BorrowPageDTO borrowPageDTO){
         log.info("查询所有借阅记录: {}", borrowPageDTO);
         PageVO<BorrowVO> borrowList = borrowService.getBorrowList(borrowPageDTO);
         return Result.success(borrowList);

@@ -49,5 +49,8 @@ public class Review implements Serializable {
 
     private Integer likeCount;
 
+//评论说明
+    private String description;
+
 
 }

@@ -14,6 +14,7 @@ import zhijianhu.dto.UserChangePasswordDTO;
 import zhijianhu.dto.UserDTO;
 import zhijianhu.dto.UserLoginDTO;
 import zhijianhu.dto.UserPageQueryDTO;
+import zhijianhu.entity.UserContext;
 import zhijianhu.entity.Users;
 import zhijianhu.exception.AccountLockedException;
 import zhijianhu.exception.AccountNotFoundException;
@@ -63,6 +64,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         }
 
 //        如果可以到这里说明用户登录成功
+        UserContext.setUserId(user.getId());
         user.setLastLogin(LocalDateTime.now());
         updateById(user);
         return user;

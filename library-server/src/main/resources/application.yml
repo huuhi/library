@@ -16,13 +16,18 @@ spring:
       port: 6379
       host: localhost
       database: 2
+  aop:
+    auto: true
 
 logging:
   level:
     zhijianhu:
-      controller: info
-      mapper: debug
-      service: debug
+      libraryserver:
+        controller: info
+        mapper: error
+        service: debug
+        aop: info
+
 mybatis-plus:
   type-aliases-package: zhijianhu.entity
   global-config:

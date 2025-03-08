@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.PenaltyDTO;
 import zhijianhu.dto.PenaltyRecordPageDTO;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.libraryserver.service.PenaltyRecordsService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.PageVO;
@@ -15,7 +16,7 @@ import zhijianhu.vo.PenaltyRecordVO;
  * @author 胡志坚
  * @version 1.0
  * 创造日期 2025/3/3
- * 说明:
+ * 说明:罚单
  */
 @RestController
 @RequestMapping("/penalty")
@@ -41,6 +42,7 @@ public class PenaltyRecordController {
     }
 //    删除！
     @DeleteMapping("/{id}")
+    @OperateLog
     public Result<Void> deleteById(@PathVariable Integer id){
         log.info("根据id删除 :{}",id);
         boolean success = penaltyRecordService.removeById(id);

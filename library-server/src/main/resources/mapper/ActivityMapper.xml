@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zhijianhu.libraryserver.mapper.ActivityMapper">
+    <select id="limit" resultType="zhijianhu.vo.ActivityVO">
+        select
+            id,
+            case activity_type
+                when 1 then 'primary'
+                when 2 then 'success'
+                when 3 then 'warning'
+                when 4 then 'info'
+                when 5 then 'danger'
+                else 'info'
+            end as type,
+            content,
+            time
+        from activity
+        order by time desc
+        limit #{limit}
+    </select>
+</mapper>

@@ -7,9 +7,7 @@ import zhijianhu.dto.UserLoginDTO;
 import zhijianhu.dto.UserPageQueryDTO;
 import zhijianhu.entity.Books;
 import zhijianhu.entity.Users;
-import zhijianhu.vo.PageVO;
-import zhijianhu.vo.UserNameAndIdVO;
-import zhijianhu.vo.UserPageVO;
+import zhijianhu.vo.*;
 
 import java.util.List;
 
@@ -34,4 +32,12 @@ public interface UsersService extends IService<Users> {
     Boolean updateConfine(Integer confine, Integer id);
 
     boolean updateStatus(Integer status, Integer id, String violationReason);
+
+    AdminInfoVO getAdminInfo(Integer id);
+
+    AdminStatisticsVO getAdminStatistics(Integer adminId);
+
+    BorrowingTrendsVO getBorrowingTrends(Integer months);
+
+    List<BookCategoryStatVO> getBookCategoryStats();
 }

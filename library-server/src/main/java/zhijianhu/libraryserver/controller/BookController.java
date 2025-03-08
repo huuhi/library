@@ -7,6 +7,9 @@ import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.BookDTO;
 import zhijianhu.dto.BookPageDTO;
 import zhijianhu.dto.ChangeBookStatusDTO;
+import zhijianhu.enumPojo.ActivityType;
+import zhijianhu.libraryserver.annotation.LogActivity;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.libraryserver.service.BooksService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.BookVO;
@@ -38,6 +41,10 @@ public class BookController {
     }
 
     @PostMapping("/add")
+    @LogActivity(
+        type = ActivityType.SYSTEM,
+        description = "系统添加了图书《{#book.name}》"
+    )
     public Result<Void> addBook(@RequestBody BookDTO book) {
         log.info("addBook: book={}", book);
         boolean success = bookService.addBook(book);
@@ -58,6 +65,11 @@ public class BookController {
     }
 //    借书 以及 还书
     @PutMapping("/status")
+    @LogActivity(
+            type = ActivityType.BORROW,
+            description = "用户{#dto.userId}{#dto.status == 0 ? '借了' : '归还了'}图书{#dto.bookId}",
+            condition = "#result.code == 1"
+    )
     public Result<Void> changeBookStatus(@RequestBody ChangeBookStatusDTO dto) {
         if(Objects.equals(dto.getStatus(), StatusConstant.DISABLE)){
             log.info("借书：{}",dto);
@@ -68,6 +80,11 @@ public class BookController {
         return success ? Result.success() : Result.error("借书已达上限");
     }
     @DeleteMapping("/{id}")
+    @LogActivity(
+        type = ActivityType.SYSTEM,
+        description = "管理员删除了图书id{#ids}"
+    )
+    @OperateLog
     public Result<Void> deleteBook(@PathVariable("id") List<Integer> ids) {
         log.info("deleteBook: id={}", ids);
         boolean b = bookService.removeBatchByIds(ids);

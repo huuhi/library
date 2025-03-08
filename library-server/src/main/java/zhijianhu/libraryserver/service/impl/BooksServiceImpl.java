@@ -33,14 +33,17 @@ import java.util.Objects;
 public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
     implements BooksService {
 
-    @Autowired
-    private BookClassesService bookClassesService;
-    @Autowired
-    private StorageAddressService storageAddressService;
-    @Autowired
-    private BorrowRecordsService borrowRecordsService;
-    @Autowired
-    private PublishService publishService;
+    private final BookClassesService bookClassesService;
+    private final StorageAddressService storageAddressService;
+    private final BorrowRecordsService borrowRecordsService;
+    private final PublishService publishService;
+
+    public BooksServiceImpl(BookClassesService bookClassesService, StorageAddressService storageAddressService, BorrowRecordsService borrowRecordsService, PublishService publishService) {
+        this.bookClassesService = bookClassesService;
+        this.storageAddressService = storageAddressService;
+        this.borrowRecordsService = borrowRecordsService;
+        this.publishService = publishService;
+    }
 
     @Override
     public PageVO<BookVO> getBooksByPage(BookPageDTO bookDTO) {

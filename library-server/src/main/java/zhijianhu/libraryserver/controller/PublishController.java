@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import zhijianhu.dto.PublishDTO;
 import zhijianhu.dto.PublishPageDTO;
 import zhijianhu.entity.Publish;
+import zhijianhu.enumPojo.ActivityType;
+import zhijianhu.libraryserver.annotation.LogActivity;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.libraryserver.service.PublishService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.PageVO;
@@ -20,7 +23,7 @@ import java.util.List;
  * @author 胡志坚
  * @version 1.0
  * 创造日期 2025/2/28
- * 说明:
+ * 说明:出版社
  */
 @RestController
 @RequestMapping("/publish")
@@ -51,6 +54,10 @@ public class PublishController {
 //    添加
     @PostMapping("/add")
     @CacheEvict(value="publishList",allEntries=true)
+    @LogActivity(
+            type= ActivityType.SYSTEM,
+            description = "添加出版社{#publishDTO.name}"
+    )
     public Result<Void> add(@RequestBody PublishDTO publishDTO) {
         Publish publish = BeanUtil.copyProperties(publishDTO, Publish.class);
         boolean save = publishService.save(publish);
@@ -66,6 +73,7 @@ public class PublishController {
 //    删除
     @DeleteMapping("/delete/{id}")
     @CacheEvict(value="publishList",allEntries=true)
+    @OperateLog
     public Result<Void> delete(@PathVariable("id") Integer id) {
         boolean b = publishService.removeById(id);
         return b ? Result.success() : Result.error("删除出版社失败");

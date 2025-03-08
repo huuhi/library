@@ -51,7 +51,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
             Claims claims = JwtUtil.parseJWT(jwt);
             Integer id = (Integer) claims.get(JwtClaimsConstant.USER_ID);
             UserContext.setUserId(id);// 设置用户id到线程变量中
-            log.info("登录成功，用户id为：" + id);
+            log.debug("登录成功，用户id为：" + UserContext.getUserId());
         } catch (Exception e) {
             Result<Void> res = Result.error("NOT_LOGIN");
             String json = JSONObject.toJSONString(res);

@@ -17,5 +17,7 @@ public class MessageConstant {
     public final static String APPEAL_FAIL="反馈失败";
     public final static String APPEAL_EXIST="你已经反馈过了，请勿重复反馈";
     public final static String SERVER_QUESTION="有问题，请联系管理员";
+    public final static String IS_NULL="请求参数为空！";
+
 
 }

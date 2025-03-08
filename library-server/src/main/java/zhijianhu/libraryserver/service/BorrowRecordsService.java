@@ -8,6 +8,8 @@ import zhijianhu.entity.BorrowRecords;
 import zhijianhu.vo.BorrowVO;
 import zhijianhu.vo.PageVO;
 
+import java.time.LocalDate;
+
 /**
 * @author windows
 * @description 针对表【borrow_records(借阅记录表)】的数据库操作Service
@@ -31,4 +33,8 @@ public interface BorrowRecordsService extends IService<BorrowRecords> {
     Boolean updateStatus(BorrowDTO borrowDTO);
 
     Boolean addReturnDate(Integer id);
+
+    Integer getLendCountByMonth(LocalDate first, LocalDate last);
+
+    Integer getReturnCountByMonth(LocalDate first, LocalDate last);
 }

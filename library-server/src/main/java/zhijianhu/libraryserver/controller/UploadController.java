@@ -26,7 +26,7 @@ public class UploadController {
     private AliOssUtil aliOssUtil;
 //    file
     @PostMapping("/common/upload")
-    public Result upload(MultipartFile file) {
+    public Result<String> upload(MultipartFile file) {
 //        将文件转换成为字节数组
         log.info("上传文件{}",file.getOriginalFilename());
         String upload;

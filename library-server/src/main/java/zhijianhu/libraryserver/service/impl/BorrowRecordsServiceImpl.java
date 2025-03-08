@@ -19,6 +19,7 @@ import zhijianhu.entity.Users;
 import zhijianhu.enumPojo.BorrowStatus;
 import zhijianhu.libraryserver.mapper.BooksMapper;
 import zhijianhu.libraryserver.mapper.BorrowRecordsMapper;
+import zhijianhu.libraryserver.mapper.UsersMapper;
 import zhijianhu.libraryserver.service.BorrowRecordsService;
 import zhijianhu.libraryserver.service.PenaltyRecordsService;
 import zhijianhu.libraryserver.service.UsersService;
@@ -50,7 +51,7 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
     @Autowired
     private BooksMapper booksService;
     @Autowired
-    private UsersService usersService;
+    private UsersMapper usersService;
     @Autowired
     private PenaltyRecordsService penaltyRecordsService;
 
@@ -75,7 +76,7 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
     @Override
     public boolean addBorrowRecord(Integer id, Integer userId) {
         Integer borrowCount = getBorrowCount(userId);
-        Integer confine = usersService.getById(userId).getConfine();
+        Integer confine = usersService.selectById(userId).getConfine();
 //        当前借阅数量大于等于限制数量，则不能借阅
         if(borrowCount >= confine){
             return false;
@@ -117,7 +118,7 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
         Set<Integer> userIds = recordsPage.getRecords().stream()
             .map(BorrowRecords::getUserId)
             .collect(Collectors.toSet());
-        Map<Integer, Users> userMap = usersService.listByIds(userIds)
+        Map<Integer, Users> userMap = usersService.selectBatchIds(userIds)
             .stream().collect(Collectors.toMap(Users::getId, u -> u));
 
         Set<Integer> bookIds = recordsPage.getRecords().stream()
@@ -155,7 +156,7 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
         Integer bookId = records.getBookId();
         BorrowVO borrowVO = BeanUtil.copyProperties(records, BorrowVO.class);
         borrowVO.setStatusName(BorrowStatus.getNameByCode(status));
-        borrowVO.setUserName(Optional.ofNullable(usersService.getById(userId).getName()).orElse("未知用户"));
+        borrowVO.setUserName(Optional.ofNullable(usersService.selectById(userId).getName()).orElse("未知用户"));
         borrowVO.setBookName(Optional.ofNullable(booksService.selectById(bookId).getName()).orElse("未知书籍"));
         return borrowVO;
     }
@@ -232,6 +233,22 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
             return updateById(record);
         }
         return false;
+    }
+
+    @Override
+    public Integer getLendCountByMonth(LocalDate first, LocalDate last) {
+        return lambdaQuery()
+                .between(BorrowRecords::getLendTime, first, last)
+                .count()
+                .intValue();
+    }
+
+    @Override
+    public Integer getReturnCountByMonth(LocalDate first, LocalDate last) {
+        return lambdaQuery().eq(BorrowRecords::getStatus,StatusConstant.DISABLE)
+            .between(BorrowRecords::getReturnTime, first, last)
+            .count()
+            .intValue();
     }
 //
 

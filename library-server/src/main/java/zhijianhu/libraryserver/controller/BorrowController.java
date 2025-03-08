@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.BorrowDTO;
 import zhijianhu.dto.BorrowPageDTO;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.libraryserver.service.BorrowRecordsService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.BorrowVO;
@@ -75,6 +76,7 @@ public class BorrowController {
     }
 //    删除
     @DeleteMapping("/{id}")
+    @OperateLog
     public Result<Void> deleteBorrowRecord(@PathVariable("id") List<Integer> ids){
         log.info("删除借阅记录: {}",ids);
         boolean b = borrowService.removeBatchByIds(ids);

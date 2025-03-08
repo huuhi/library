@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -19,17 +20,20 @@ import java.util.Arrays;
  * @author 胡志坚
  * @version 1.0
  * 创造日期 2025/3/7
- * 说明:记录操作日志的切面类
+ * 说明:记录操作日志的切面类,只记录敏感操作
  */
-//@Aspect
-//@Component
+@Aspect
+@Component
 @Slf4j
 public class LogRecord {
-//    @Autowired
+    @Autowired
     private AuditLogService auditLogService;
 
-//    只记录server包下的操作日志
-    @Around("execution(* zhijianhu.libraryserver.service.*.*(..))")
+//    只记录被注解OperateLog注解的方法
+    @Pointcut("@annotation(zhijianhu.libraryserver.annotation.OperateLog)")
+    public void activityLogPointcut() {
+    }
+    @Around("activityLogPointcut()")
     public Object recordLog(ProceedingJoinPoint joinPoint) throws Throwable {
 //        获取方法签名
         MethodSignature signature =(MethodSignature) joinPoint.getSignature();
@@ -61,7 +65,7 @@ public class LogRecord {
         Integer userId = UserContext.getUserId();
         if (userId == null) {
             log.info("未获取到用户信息，当前线程：{}",Thread.currentThread().getName());
-            return null;
+            return 0;
         } else {
             return userId;
         }

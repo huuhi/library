@@ -2,6 +2,7 @@ package zhijianhu.libraryserver.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
 import zhijianhu.entity.UserQuestion;
 
 /**
@@ -11,7 +12,8 @@ import zhijianhu.entity.UserQuestion;
 * @Entity zhijianhu/libraryserver.UserQuestion
 */
 public interface UserQuestionMapper extends BaseMapper<UserQuestion> {
-
+    @Select("select count(*) from user_question")
+    Integer getAllCount();
 }
 
 

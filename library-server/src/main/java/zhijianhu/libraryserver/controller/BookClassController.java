@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import zhijianhu.dto.ClassDTO;
 import zhijianhu.dto.ClassPageDTO;
 import zhijianhu.entity.BookClasses;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.libraryserver.service.BookClassesService;
 import zhijianhu.libraryserver.service.impl.BookClassesServiceImpl;
 import zhijianhu.result.Result;
@@ -79,6 +80,7 @@ public class BookClassController {
     //    删除分类
     @DeleteMapping("/{id}")
     @CacheEvict(value = "clazz", allEntries = true)
+    @OperateLog
     public Result<String> deleteClazz(@PathVariable("id") Integer id){
         log.info("删除分类,id={}",id);
         boolean remove = bookClassesService.removeById(id);

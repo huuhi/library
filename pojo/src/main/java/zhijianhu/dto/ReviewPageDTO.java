@@ -1,5 +1,6 @@
 package zhijianhu.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * 说明:
  */
 @Data
+@Builder
 public class ReviewPageDTO {
     private Integer pageNum;
     private Integer pageSize;

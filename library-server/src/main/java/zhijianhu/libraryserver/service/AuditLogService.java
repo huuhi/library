@@ -2,7 +2,11 @@ package zhijianhu.libraryserver.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import zhijianhu.dto.AuditLogDTO;
+import zhijianhu.dto.LogDTO;
 import zhijianhu.entity.AuditLog;
+import zhijianhu.vo.AuditLogPageVO;
+import zhijianhu.vo.PageVO;
 
 /**
 * @author windows
@@ -11,4 +15,9 @@ import zhijianhu.entity.AuditLog;
 */
 public interface AuditLogService extends IService<AuditLog> {
 
+    PageVO<AuditLogPageVO> getLogByPage(LogDTO logDTO);
+
+    boolean updateNote(AuditLogDTO auditLogDTO);
+
+    AuditLogPageVO getLogById(Integer id);
 }

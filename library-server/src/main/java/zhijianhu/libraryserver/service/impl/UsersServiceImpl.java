@@ -1,12 +1,15 @@
 package zhijianhu.libraryserver.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.constant.StatusConstant;
@@ -14,22 +17,24 @@ import zhijianhu.dto.UserChangePasswordDTO;
 import zhijianhu.dto.UserDTO;
 import zhijianhu.dto.UserLoginDTO;
 import zhijianhu.dto.UserPageQueryDTO;
-import zhijianhu.entity.UserContext;
-import zhijianhu.entity.Users;
+import zhijianhu.entity.*;
 import zhijianhu.exception.AccountLockedException;
 import zhijianhu.exception.AccountNotFoundException;
 import zhijianhu.exception.PasswordErrorException;
-import zhijianhu.libraryserver.service.UsersService;
+import zhijianhu.libraryserver.mapper.BorrowRecordsMapper;
+import zhijianhu.libraryserver.mapper.UserQuestionMapper;
+import zhijianhu.libraryserver.service.*;
 import zhijianhu.libraryserver.mapper.UsersMapper;
 import org.springframework.stereotype.Service;
 import zhijianhu.query.PageQuery;
-import zhijianhu.vo.PageVO;
-import zhijianhu.vo.UserNameAndIdVO;
-import zhijianhu.vo.UserPageVO;
+import zhijianhu.vo.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 
 /**
 * @author windows
@@ -43,6 +48,17 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
    @Autowired
    private UsersMapper usersMapper;
+   @Autowired
+   @Lazy
+   private BooksService booksService;
+//   因为借阅service注入我的bean,所以这里注入mapper
+    @Autowired
+    private UserQuestionMapper userQuestionService;
+
+    @Autowired
+    private BookClassesService classesService;
+   @Autowired
+   private BorrowRecordsService borrowRecordsService;
 
     @Override
     public Users login(UserLoginDTO userLoginDTO) {
@@ -59,7 +75,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
 
-        if(user.getStatus()== StatusConstant.DISABLE){
+        if(Objects.equals(user.getStatus(), StatusConstant.DISABLE)){
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
 
@@ -147,6 +163,117 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         }
         return updateById(user);
     }
+
+    @Override
+    public AdminInfoVO getAdminInfo(Integer id) {
+        Users user = getById(id);
+        return BeanUtil.copyProperties(user, AdminInfoVO.class);
+    }
+
+    @Override
+    public AdminStatisticsVO getAdminStatistics(Integer adminId) {
+        //总用户数量
+        int count = lambdaQuery().count().intValue();//解决
+//        用户增长率是 总用户数跟上个月的用户数量相比较
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime lastMonth = now.minusMonths(1);
+        int lastMonthCount = lambdaQuery()
+                .between(Users::getRegTime, lastMonth, now)
+                .count().intValue();
+        Double userGrowth = (double) (count - lastMonthCount) / lastMonthCount;
+//        总图书
+        int bookTotal = booksService.lambdaQuery().count().intValue();
+//         获取上个月添加的图书
+        int lastMonthBookCount = booksService.lambdaQuery()
+                .between(Books::getCreateTime, lastMonth, now)
+                .count().intValue();
+        Double bookGrowth = (double) (bookTotal - lastMonthBookCount) / lastMonthBookCount;
+//        获取本月借阅量
+        LocalDate localDate = LocalDate.now();
+        LocalDate lastMonthDate = localDate.minusMonths(1);
+        Long borrowCount = borrowRecordsService
+                .lambdaQuery()
+                .between(BorrowRecords::getLendTime, lastMonthDate, localDate)
+                .count();
+//        获取借阅总数
+        Long totalBorrowCount = borrowRecordsService.count();
+//        计算这个月的借阅增长率
+        Double borrowGrowth = (double) (borrowCount - totalBorrowCount) / totalBorrowCount;
+
+//        获取已解决问题数量
+        Long solveCount = userQuestionService.selectCount(
+                new QueryWrapper<UserQuestion>()
+                        .eq("status", StatusConstant.ENABLE)
+                        .eq("manager_id", adminId)
+        );
+//        获取所有问题
+        Integer allCount = userQuestionService.getAllCount();
+//        问题解决率
+        Double issueResolutionRate = (double) solveCount / allCount;
+        return AdminStatisticsVO.builder()
+                .bookGrowth(bookGrowth)
+                .borrowGrowth(borrowGrowth)
+                .issueResolutionRate(issueResolutionRate)
+                .totalUsers(count)
+                .monthlyBorrows(borrowCount.intValue())
+                .resolvedIssues(solveCount.intValue())
+                .totalBooks(bookTotal)
+                .userGrowth(userGrowth)
+                .build();
+
+    }
+
+    @Override
+    public BorrowingTrendsVO getBorrowingTrends(Integer months) {
+//        获取前months的月份
+        List<String> month = new ArrayList<>();
+        List<Integer> borrowed = new ArrayList<>();
+        List<Integer> returned = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+
+
+        for (int i = 0; i<months ; i++) {
+            LocalDate currentMonth = now.minusMonths(i);
+            String monthName = currentMonth.getMonth().getDisplayName(TextStyle.SHORT, Locale.CHINA);
+            month.add(monthName);
+            LocalDate first = currentMonth.with(TemporalAdjusters.firstDayOfMonth());
+            LocalDate last = currentMonth.with(TemporalAdjusters.lastDayOfMonth());
+//          获取当月借书数量
+            Integer lendCount= borrowRecordsService.getLendCountByMonth(first,last);
+//            获取当月还书数量
+            Integer returnCount= borrowRecordsService.getReturnCountByMonth(first,last);
+            borrowed.add(lendCount);
+            returned.add(returnCount);
+        }
+//        获取当前月份的借书还书数量
+//        减一个月
+        Collections.reverse(month);
+        Collections.reverse(borrowed);
+        Collections.reverse(returned);
+        return BorrowingTrendsVO.builder()
+                .months(month)
+                .borrowed(borrowed)
+                .returned(returned)
+                .build();
+    }
+
+    @Override
+    public List<BookCategoryStatVO> getBookCategoryStats() {
+        List<ClazzVO> bossClazz = classesService.getBossClazz();
+        ArrayList<BookCategoryStatVO> list = new ArrayList<>();
+        for(ClazzVO clazz:bossClazz){
+            String name = clazz.getName();
+            Integer id = clazz.getId();
+            List<Integer> allSubCategoryIds = classesService.getAllSubCategoryIds(id);
+            int count = booksService.lambdaQuery()
+                    .in(Books::getClazzId, allSubCategoryIds)
+                    .count().intValue();
+            list.add(new BookCategoryStatVO(name,count));
+        }
+        return list;
+    }
+
+
 }
 
 

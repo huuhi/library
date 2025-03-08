@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.dto.AddressPageDTO;
 import zhijianhu.entity.StorageAddress;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.libraryserver.service.StorageAddressService;
 import zhijianhu.libraryserver.service.impl.StorageAddressServiceImpl;
 import zhijianhu.result.Result;
@@ -58,6 +59,7 @@ public class AddressController {
 //    修改地址
     @PostMapping("/update")
     @CacheEvict(value="addressList",allEntries=true)
+    @OperateLog
     public Result<Void> updateAddress(@RequestBody StorageAddress address) {
         boolean save = storageAddressService.updateById(address);
         return save? Result.success(): Result.error("修改失败");
@@ -65,13 +67,14 @@ public class AddressController {
 //    新增地址
     @PostMapping("/add")
     @CacheEvict(value="addressList",allEntries=true)
-    public Result addAddress(@RequestBody StorageAddress address) {
+    public Result<Void> addAddress(@RequestBody StorageAddress address) {
         boolean save = storageAddressService.save(address);
         return save? Result.success(): Result.error("新增失败");
     }
     @DeleteMapping("/delete/{id}")
     @CacheEvict(value="addressList",allEntries=true)
-    public Result deleteAddress(@PathVariable("id") Integer id) {
+    @OperateLog
+    public Result<Void> deleteAddress(@PathVariable("id") Integer id) {
         boolean remove = storageAddressService.removeById(id);
         return remove? Result.success() : Result.error("删除失败");
     }

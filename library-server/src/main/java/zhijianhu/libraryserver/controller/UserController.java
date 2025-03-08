@@ -12,6 +12,7 @@ import zhijianhu.dto.UserDTO;
 import zhijianhu.dto.UserLoginDTO;
 import zhijianhu.dto.UserPageQueryDTO;
 import zhijianhu.entity.UserContext;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.properties.JwtProperties;
 import zhijianhu.result.Result;
 import zhijianhu.libraryserver.service.UsersService;
@@ -83,6 +84,7 @@ public class UserController {
     }
 //   修改状态
     @PutMapping("/status/{status}")
+    @OperateLog
     public Result<Void> updateStatus(@PathVariable("status") Integer status,
                                @RequestParam("id") Integer id,
                                @RequestParam(value = "violationReason" , required = false) String violationReason){
@@ -92,6 +94,7 @@ public class UserController {
     }
 //    修改密码
     @PutMapping("/password")
+    @OperateLog
     public Result<Void> updatePassword(@RequestBody UserChangePasswordDTO userChangePasswordDTO){
         log.info("修改用户密码：{}",userChangePasswordDTO.getId());
         Boolean b= usersService.updatePassword(userChangePasswordDTO);
@@ -123,6 +126,7 @@ public class UserController {
     }
 //    修改用户借书上限
     @PutMapping("/confine/{confine}")
+    @OperateLog
     public Result<Void> updateConfine(@PathVariable("confine") Integer confine,
                                @RequestParam("id") Integer id){
         Boolean success= usersService.updateConfine(confine,id);
@@ -135,5 +139,6 @@ public class UserController {
         UserContext.clear();//清除用户id
         return Result.success();
     }
+
 
 }

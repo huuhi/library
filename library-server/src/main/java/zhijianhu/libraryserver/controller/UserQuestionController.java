@@ -10,6 +10,9 @@ import zhijianhu.dto.AddUserQuestionDTO;
 import zhijianhu.dto.QuestionWorkOutDTO;
 import zhijianhu.dto.UserQuestionPageDTO;
 import zhijianhu.entity.UserQuestion;
+import zhijianhu.enumPojo.ActivityType;
+import zhijianhu.libraryserver.annotation.LogActivity;
+import zhijianhu.libraryserver.annotation.OperateLog;
 import zhijianhu.libraryserver.service.UserQuestionService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.PageVO;
@@ -34,6 +37,10 @@ public class UserQuestionController {
 
     @PostMapping("/add")
     @CacheEvict(value = "userQuestion", allEntries = true)
+    @LogActivity(
+            type= ActivityType.AUDIT,
+            description = "用户{#dto.userId}反馈问题{#dto.note}"
+    )
     public Result<Void> addUserQuestion(@RequestBody AddUserQuestionDTO dto) {
         log.info("用户反馈问题：{}", dto);
         boolean exist = userQuestionService.isExist(dto.getUserId(), dto.getBorrowRecordId());
@@ -54,6 +61,10 @@ public class UserQuestionController {
 //    管理员处理用户的问题
     @PostMapping("/workOut")
     @CacheEvict(value = "userQuestion", allEntries = true)
+    @LogActivity(
+            type = ActivityType.AUDIT,
+            description = "管理员{#dto.managerId}处理用户的问题{#dto.id}"
+    )
     public Result<Void> adminDealUserQuestion(@RequestBody QuestionWorkOutDTO dto) {
         log.info("管理员处理用户的问题：{}", dto);
         boolean success= userQuestionService.handleUserQuestion(dto);
@@ -66,6 +77,7 @@ public class UserQuestionController {
         return Result.success(userQuestion);
     }
     @DeleteMapping("/{id}")
+    @OperateLog
     public Result<Void> deleteUserQuestion(@PathVariable("id") List<Integer> ids) {
         log.info("删除用户的问题：{}", ids);
         boolean success= userQuestionService.removeBatchByIds(ids);
@@ -84,5 +96,16 @@ public class UserQuestionController {
         log.info("根据用户id获取用户的反馈问题：{}",id);
         List<UserQuestionVO> userQuestion = userQuestionService.getUserQuestionByUserId(id);
         return Result.success(userQuestion);
+    }
+    @GetMapping("/user-feedback/pending")
+    public Result<PageVO<UserQuestionPageVO>> getPendingFeedbacks(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "5") Integer pageSize) {
+        UserQuestionPageDTO dto = UserQuestionPageDTO.builder()
+                .pageNum(pageNum)
+                .pageSize(pageSize)
+                .build();
+        PageVO<UserQuestionPageVO> pendingFeedbacks =userQuestionService.getUserQuestionList(dto);
+        return Result.success(pendingFeedbacks);
     }
 }

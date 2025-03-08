@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import zhijianhu.dto.PenaltyDTO;
 import zhijianhu.dto.PenaltyRecordPageDTO;
@@ -28,6 +29,7 @@ import java.math.BigDecimal;
 public class PenaltyRecordsServiceImpl extends ServiceImpl<PenaltyRecordsMapper, PenaltyRecords>
     implements PenaltyRecordsService {
     @Autowired
+    @Lazy
     private UsersService usersService;
     @Autowired
     private BooksMapper booksService;

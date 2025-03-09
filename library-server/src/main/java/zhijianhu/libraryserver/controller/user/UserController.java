@@ -1,4 +1,4 @@
-package zhijianhu.libraryserver.controller;
+package zhijianhu.libraryserver.controller.user;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;

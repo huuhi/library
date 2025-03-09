@@ -31,19 +31,19 @@
                 </ModuleInfoGo>
               </list>
             </option>
+            <option name="needsComment" value="true" />
             <option name="needsModel" value="false" />
             <option name="relativePackage" value="" />
             <option name="superClass" value="" />
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="Activity" />
-                  <option name="tableName" value="activity" />
+                  <option name="className" value="PostLike" />
+                  <option name="tableName" value="post_like" />
                 </TableUIInfo>
               </list>
             </option>
             <option name="templatesName" value="custom-model-swagger" />
-            <option name="useLombokPlugin" value="true" />
           </GenerateConfig>
         </option>
         <option name="moduleName" value="library-server" />

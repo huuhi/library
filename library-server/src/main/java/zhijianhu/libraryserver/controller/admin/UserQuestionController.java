@@ -1,4 +1,4 @@
-package zhijianhu.libraryserver.controller;
+package zhijianhu.libraryserver.controller.admin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.AddUserQuestionDTO;
 import zhijianhu.dto.QuestionWorkOutDTO;
 import zhijianhu.dto.UserQuestionPageDTO;
-import zhijianhu.entity.UserQuestion;
 import zhijianhu.enumPojo.ActivityType;
 import zhijianhu.libraryserver.annotation.LogActivity;
 import zhijianhu.libraryserver.annotation.OperateLog;

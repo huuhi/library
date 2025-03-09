@@ -1,11 +1,11 @@
-package zhijianhu.libraryserver.controller;
+package zhijianhu.libraryserver.controller.user;
 
-import cn.hutool.db.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.ExamineReviewDTO;
+import zhijianhu.dto.GetReviewDTO;
 import zhijianhu.dto.ReviewDTO;
 import zhijianhu.dto.ReviewPageDTO;
 import zhijianhu.enumPojo.ActivityType;
@@ -39,11 +39,10 @@ public class ReviewController {
         Boolean  success= reviewService.sendReview(reviewDTO);
         return success? Result.success() : Result.error("评论疑似违规，等待管理员审核");
     }
-    @GetMapping("/get/{bookId}/{userId}")
-    public Result<List<ReviewVO>> getReviewByBookId(@PathVariable("bookId") Integer bookId,
-                                                    @PathVariable("userId") Integer userId){
-        log.info("获取评论:{}", bookId);
-        List<ReviewVO> reviewList = reviewService.getReviewByBookId(bookId,userId);
+    @GetMapping("/get")
+    public Result<List<ReviewVO>> getReviewByBookId(@ModelAttribute GetReviewDTO dto){
+        log.info("获取评论:{}", dto);
+        List<ReviewVO> reviewList = reviewService.getReviewByBookId(dto);
         return Result.success(reviewList);
     }
 //    下面的真正删除评论，而不是逻辑删除
@@ -84,4 +83,7 @@ public class ReviewController {
         PageVO<ReviewPageVO> pageVO = reviewService.getReviewByPage(dto);
         return Result.success(pageVO);
     }
+
+
+
 }

@@ -52,5 +52,6 @@ public class Review implements Serializable {
 //评论说明
     private String description;
 
+    private Integer postId;
 
 }

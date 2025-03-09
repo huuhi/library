@@ -3,6 +3,7 @@ package zhijianhu.libraryserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import zhijianhu.dto.ExamineReviewDTO;
+import zhijianhu.dto.GetReviewDTO;
 import zhijianhu.dto.ReviewDTO;
 import zhijianhu.dto.ReviewPageDTO;
 import zhijianhu.entity.Review;
@@ -22,7 +23,7 @@ public interface ReviewService extends IService<Review> {
 
     Boolean sendReview(ReviewDTO reviewDTO);
 
-    List<ReviewVO> getReviewByBookId(Integer bookId, Integer userId);
+    List<ReviewVO> getReviewByBookId(GetReviewDTO dto);
 
     boolean completeRemove(Integer id);
 

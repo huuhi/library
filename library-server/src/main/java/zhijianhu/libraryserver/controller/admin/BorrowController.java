@@ -1,8 +1,7 @@
-package zhijianhu.libraryserver.controller;
+package zhijianhu.libraryserver.controller.admin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.BorrowDTO;
@@ -71,6 +70,7 @@ public class BorrowController {
     @PostMapping("/renew/{id}")
     public Result<Void> renew(@PathVariable("id") Integer id){
 //        这里需要判断用户是否续借过一次，如果有，则不能续借
+        log.info("续借id{}",id);
         Boolean success= borrowService.addReturnDate(id);
         return success ? Result.success() : Result.error(MessageConstant.NOT_ALLOW_LEND);
     }

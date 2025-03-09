@@ -38,6 +38,7 @@ mybatis-plus:
       logic-not-delete-value: 1
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   pagination:
     enabled: true
 library:

@@ -1,4 +1,4 @@
-package zhijianhu.libraryserver.controller;
+package zhijianhu.libraryserver.controller.admin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author 胡志坚
  * @version 1.0
  * 创造日期 2025/3/8
- * 说明:
+ * 说明:统计用户信息
  */
 @RestController
 @RequestMapping("/admin")

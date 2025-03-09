@@ -3,6 +3,8 @@ package zhijianhu.libraryserver.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import zhijianhu.constant.MessageConstant;
+import zhijianhu.result.Result;
 
 /**
  * @author 胡志坚
@@ -14,9 +16,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class AllExceptionHandler {
     @ExceptionHandler(Exception.class)
-    public String handleException(Exception e) {
-        log.error("发生异常: {}", e.getMessage());
-        return "发生异常，请看日志";
+    public Result<Void> handleException(Exception e) {
+        log.error("发生异常: {}", e);
+        return Result.error(MessageConstant.SERVER_QUESTION);
     }
 
 }

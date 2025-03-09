@@ -1,4 +1,4 @@
-package zhijianhu.libraryserver.controller;
+package zhijianhu.libraryserver.controller.admin;
 
 import com.aliyuncs.exceptions.ClientException;
 import lombok.extern.slf4j.Slf4j;

@@ -6,14 +6,17 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.repository.configuration.RedisRepositoriesRegistrar;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.ExamineReviewDTO;
+import zhijianhu.dto.GetReviewDTO;
 import zhijianhu.dto.ReviewDTO;
 import zhijianhu.dto.ReviewPageDTO;
+import zhijianhu.entity.Posts;
 import zhijianhu.entity.Review;
 import zhijianhu.entity.ReviewLike;
 import zhijianhu.entity.Users;
+import zhijianhu.libraryserver.service.PostService;
 import zhijianhu.libraryserver.service.ReviewLikeService;
 import zhijianhu.libraryserver.service.ReviewService;
 import zhijianhu.libraryserver.mapper.ReviewMapper;
@@ -21,14 +24,13 @@ import org.springframework.stereotype.Service;
 import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
 import zhijianhu.result.TextResult;
+import zhijianhu.utils.ServiceUtils;
 import zhijianhu.utils.TextModerationPlusDemo;
 import zhijianhu.vo.PageVO;
 import zhijianhu.vo.ReviewPageVO;
 import zhijianhu.vo.ReviewVO;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 /**
 * @author windows
 * @description 针对表【review(图书评论表)】的数据库操作Service实现
@@ -38,15 +40,27 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
     implements ReviewService{
-    @Autowired
-    private ReviewLikeService reviewLikeService;
-    @Autowired
-    private UsersService userService;
-    @Autowired
-    private ReviewMapper reviewMapper;
+    private final ReviewLikeService reviewLikeService;
+    private final UsersService userService;
+    private final ReviewMapper reviewMapper;
+    private final PostService postService;
+
+    public ReviewServiceImpl(ReviewLikeService reviewLikeService,
+                             UsersService userService, ReviewMapper reviewMapper,
+                             PostService postService) {
+        this.reviewLikeService = reviewLikeService;
+        this.userService = userService;
+        this.reviewMapper = reviewMapper;
+        this.postService=postService;
+    }
+
     @Override
     public Boolean sendReview(ReviewDTO reviewDTO) {
 //        发送评论
+//        如果是在帖子下发送评论需要指向额外的操作
+        if(reviewDTO.getPostId()!=null){
+            addReviewCount(reviewDTO.getPostId());
+        }
         String content = reviewDTO.getContent();
         Review review = BeanUtil.copyProperties(reviewDTO, Review.class);
         String image = userService.getById(reviewDTO.getUserId()).getImage();
@@ -64,14 +78,30 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
         return save(review);
     }
 
+    private void addReviewCount(Integer postId) {
+        Posts post = postService.getById(postId);
+        post.setReviewCount(post.getReviewCount()+1);
+        postService.updateById(post);
+    }
+
     @Override
-    public List<ReviewVO> getReviewByBookId(Integer bookId, Integer userId) {
+    public List<ReviewVO> getReviewByBookId(GetReviewDTO dto) {
+        Integer postId = dto.getPostId();
+        Integer bookId = dto.getBookId();
+        Integer userId = dto.getUserId();
         List<Review> list = lambdaQuery()
-                .eq(Review::getBookId, bookId)
+                .eq(bookId!=null, Review::getBookId, bookId)
+                .eq(postId != null, Review::getPostId, postId)
                 .list();
         if(list!=null&& !list.isEmpty()){
 //            获取所有的用户id
-            Map<Integer, String> map = getUserMap(list);
+            Map<Integer, String> map = ServiceUtils.buildEntityMap(
+                    list,
+                    Review::getUserId,
+                    userService::listByIds,
+                    Users::getId,
+                    Users::getUsername
+            );
             log.info("getReviewByBookId: "+list);
             List<ReviewVO> reviewVO = BeanUtil.copyToList(list, ReviewVO.class);
             reviewVO.forEach(review->{
@@ -115,7 +145,13 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
         Page<Review> mpPage = pageQuery.toMpPage(OrderItem.asc("create_time"));
 //        查询
             Page<Review> page= reviewMapper.getReviewByPage(isAudit, mpPage);
-            Map<Integer, String> userMap = getUserMap(page.getRecords());
+            Map<Integer, String> userMap = ServiceUtils.buildEntityMap(
+                    page.getRecords(),
+                    Review::getUserId,
+                    userService::listByIds,
+                    Users::getId,
+                    Users::getUsername
+            );
             return PageVO.of(page,review->{
                 Integer userId = review.getUserId();
                 ReviewPageVO reviewPageVO = BeanUtil.copyProperties(review, ReviewPageVO.class);
@@ -139,19 +175,6 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
                 .eq(ReviewLike::getReviewId, reviewId)
                 .one();
         return one != null;
-    }
-    private Map<Integer, String> getUserMap(List<Review> list) {
-        Set<Integer> collect = list.stream()
-        .map(Review::getUserId)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toSet());
-//            获取所有的用户名，以map形式返回
-        if (collect.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return userService.listByIds(collect)
-        .stream()
-        .collect(Collectors.toMap(Users::getId, Users::getUsername));
     }
 }
 

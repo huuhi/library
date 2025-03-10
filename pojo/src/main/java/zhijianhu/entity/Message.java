@@ -1,15 +1,18 @@
 package zhijianhu.entity;
 
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
 * 消息表
 * @TableName message
 */
 @Data
+@Builder
 public class Message implements Serializable {
 
 
@@ -23,11 +26,17 @@ public class Message implements Serializable {
     * 发送消息的人
     */
 
-    private String sender;
+    private Integer senderId;
 
     private Integer receiverId;
 
     private Integer isRead;
+
+    private LocalDateTime time;
+
+    private Integer postId;
+
+    private Integer reviewId;
 
 
 }

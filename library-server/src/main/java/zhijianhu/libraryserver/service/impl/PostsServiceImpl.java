@@ -114,7 +114,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
             return List.of();//说明没有帖子
         }
         List<PostVO> postVOS = BeanUtil.copyToList(posts, PostVO.class);
-//        批量用户用户id和用户名，方便插入数据
+//        批量用户用户id和用户名头像，方便插入数据
         Map<Integer, UserNameAndImage> Usermap = ServiceUtils.buildEntityMap(
                 posts,
                 Posts::getUserId,

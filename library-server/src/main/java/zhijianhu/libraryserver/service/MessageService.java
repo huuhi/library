@@ -3,6 +3,9 @@ package zhijianhu.libraryserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import zhijianhu.entity.Message;
+import zhijianhu.vo.MessageVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -11,4 +14,5 @@ import zhijianhu.entity.Message;
 */
 public interface MessageService extends IService<Message> {
 
+    List<MessageVO> getLikeMessageByUserId(Integer userId);
 }

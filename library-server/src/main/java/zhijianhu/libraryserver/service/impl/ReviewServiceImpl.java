@@ -6,22 +6,17 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.repository.configuration.RedisRepositoriesRegistrar;
+import org.springframework.transaction.annotation.Transactional;
+import zhijianhu.constant.MessageType;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.ExamineReviewDTO;
 import zhijianhu.dto.GetReviewDTO;
 import zhijianhu.dto.ReviewDTO;
 import zhijianhu.dto.ReviewPageDTO;
-import zhijianhu.entity.Posts;
-import zhijianhu.entity.Review;
-import zhijianhu.entity.ReviewLike;
-import zhijianhu.entity.Users;
-import zhijianhu.libraryserver.service.PostService;
-import zhijianhu.libraryserver.service.ReviewLikeService;
-import zhijianhu.libraryserver.service.ReviewService;
+import zhijianhu.entity.*;
+import zhijianhu.libraryserver.service.*;
 import zhijianhu.libraryserver.mapper.ReviewMapper;
 import org.springframework.stereotype.Service;
-import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
 import zhijianhu.result.TextResult;
 import zhijianhu.utils.ServiceUtils;
@@ -44,23 +39,23 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
     private final UsersService userService;
     private final ReviewMapper reviewMapper;
     private final PostService postService;
+    private final MessageService messageService;
 
     public ReviewServiceImpl(ReviewLikeService reviewLikeService,
                              UsersService userService, ReviewMapper reviewMapper,
-                             PostService postService) {
+                             PostService postService, MessageService messageService) {
         this.reviewLikeService = reviewLikeService;
         this.userService = userService;
         this.reviewMapper = reviewMapper;
         this.postService=postService;
+        this.messageService = messageService;
     }
 
     @Override
+    @Transactional
     public Boolean sendReview(ReviewDTO reviewDTO) {
 //        发送评论
 //        如果是在帖子下发送评论需要指向额外的操作
-        if(reviewDTO.getPostId()!=null){
-            addReviewCount(reviewDTO.getPostId());
-        }
         String content = reviewDTO.getContent();
         Review review = BeanUtil.copyProperties(reviewDTO, Review.class);
         String image = userService.getById(reviewDTO.getUserId()).getImage();
@@ -72,10 +67,22 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
         if(s!=null&&!s.equals("none")){
 //            说明评论有问题！
             review.setIsAudit(StatusConstant.DISABLE);
+//            保存但是不展示，让管理员审核
             save(review);
             return false;
         }
-        return save(review);
+        Integer postId = reviewDTO.getPostId();
+        boolean save = save(review);
+        if(postId!=null){
+//            帖子评论加1
+            addReviewCount(reviewDTO.getPostId());
+//           说明是给帖子评论，添加，不需要给图书评论添加消息列表
+//         这里不仅需要帖子的id，还需要获取评论的id，可以根据帖子的id和用户id获取评论的id
+            Integer reviewId = review.getId();
+            Integer userId = postService.getById(postId).getUserId();
+            saveMessage(userId,review.getUserId(),postId,reviewId);
+        }
+        return save;
     }
 
     private void addReviewCount(Integer postId) {
@@ -175,6 +182,18 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
                 .eq(ReviewLike::getReviewId, reviewId)
                 .one();
         return one != null;
+    }
+    private void saveMessage(Integer receiverId, Integer senderId, Integer postId, Integer reviewId){
+            if(Objects.equals(receiverId, senderId)){
+                return;
+            }
+            Message message = Message.builder()
+                    .receiverId(receiverId)
+                    .senderId(senderId)
+                    .postId(postId)
+                    .reviewId(reviewId)
+                    .type(MessageType.REVIEW).build();
+            messageService.save(message);
     }
 }
 

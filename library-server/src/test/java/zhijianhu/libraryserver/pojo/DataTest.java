@@ -57,8 +57,6 @@ public class DataTest {
         for (String monthName : monthNames) {
             System.out.println(monthName);
         }
-
-
     }
 
 }

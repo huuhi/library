@@ -40,15 +40,15 @@ public class PostController {
         return success?Result.success():Result.error(MessageConstant.UPDATE_POST_FAILURE);
     }
 //  获取帖子
-    @GetMapping("/getAll")
+    @GetMapping("/list")
     public Result<List<PostVO>> getAllPost(String keyWords){
         log.info("获取帖子");
         List<PostVO> postVOList=postService.getAllPost(keyWords,null);
         return Result.success(postVOList);
     }
-//    根据id获取帖子
-    @GetMapping("/{id}")
-    public Result<List<PostVO>> getPostById(@PathVariable("id") Integer id){
+//    根据用户id获取帖子
+    @GetMapping("/{userId}")
+    public Result<List<PostVO>> getPostById(@PathVariable("userId") Integer id){
         log.info("获取帖子");
         List<PostVO> postVOList=postService.getAllPost(null,id);
         return Result.success(postVOList);
@@ -59,6 +59,12 @@ public class PostController {
         log.info("删除帖子");
         boolean success=postService.removeById(id);
         return success?Result.success():Result.error(MessageConstant.DELETE_POST_FAILURE);
+    }
+//    根据帖子id获取
+    @GetMapping("/get/{id}")
+    public Result<PostVO>  getById(@PathVariable("id") Integer id){
+        PostVO post= postService.getPostById(id);
+        return Result.success(post);
     }
 
 }

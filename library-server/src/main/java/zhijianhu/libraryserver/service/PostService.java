@@ -2,7 +2,6 @@ package zhijianhu.libraryserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import zhijianhu.dto.PostDTO;
-import zhijianhu.dto.PostLikeDTO;
 import zhijianhu.entity.Posts;
 import zhijianhu.vo.PostVO;
 
@@ -20,6 +19,8 @@ public interface PostService extends IService<Posts> {
     boolean updatePostById(PostDTO postDTO);
 
     List<PostVO> getAllPost(String key, Integer userId);
+
+    PostVO getPostById(Integer id);
 
 //    boolean likePost(PostLikeDTO postDTO);
 

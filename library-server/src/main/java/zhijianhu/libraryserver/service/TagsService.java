@@ -3,6 +3,9 @@ package zhijianhu.libraryserver.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import zhijianhu.entity.Tags;
+import zhijianhu.vo.TagVO;
+
+import java.util.List;
 
 /**
 * @author windows
@@ -11,4 +14,5 @@ import zhijianhu.entity.Tags;
 */
 public interface TagsService extends IService<Tags> {
 
+    List<TagVO> getTags(String name);
 }

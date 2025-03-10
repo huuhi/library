@@ -14,7 +14,6 @@ import zhijianhu.result.Result;
  * 说明:
  */
 @RestController
-@RequestMapping("/post-like")
 @Slf4j
 public class PostLikeController {
     private final PostLikeService postLikeService;
@@ -24,7 +23,7 @@ public class PostLikeController {
     }
 
     //    点赞
-    @PostMapping()
+    @PostMapping("/post-like")
     public Result<Void> likePost(@RequestBody PostLikeDTO postDTO){
         log.info("点赞帖子");
         boolean success=postLikeService.likePost(postDTO);
@@ -32,7 +31,7 @@ public class PostLikeController {
     }
 
     @DeleteMapping("/unlike")
-    public Result<Void> unlikePost(@RequestBody PostLikeDTO postDTO){
+    public Result<Void> unlikePost(@ModelAttribute PostLikeDTO postDTO){
         log.info("取消点赞帖子");
         boolean success=postLikeService.unlikePost(postDTO);
         return success?Result.success(): Result.error(MessageConstant.UNLIKE_POST_FAILURE);

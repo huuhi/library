@@ -64,18 +64,23 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
 //    分页获取用户的反馈记录
     @Override
     public PageVO<UserQuestionPageVO> getUserQuestionList(UserQuestionPageDTO dto) {
+//      分页查询的参数
         Integer pageNum = dto.getPageNum();
         Integer pageSize = dto.getPageSize();
+//        问题类型跟状态
         Integer type = dto.getType();
         Integer status = dto.getStatus();
         PageQuery pageQuery = new PageQuery();
         pageQuery.setPageSize(pageSize);
         pageQuery.setPage(pageNum);
+//        获取分页对象
         Page<UserQuestion> mpPage = pageQuery.toMpPage();
+//        查询
         Page<UserQuestion> page = lambdaQuery()
                 .eq(type != null, UserQuestion::getAppealType, type)
                 .eq(status != null, UserQuestion::getStatus, status)
                 .page(mpPage);
+//        对结果进行处理
         return PageVO.of(page, this::getUserQuestionPageVO);
     }
 
@@ -139,7 +144,6 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
                 question.setManagerName(managerMap.get(managerId));
             }
             toUserQuestionVO(question);
-
         });
 //        根据用户id查询反馈列表，说明用户在查看消息，这个时候需要将未读的消息设置为已读
         lambdaUpdate()
@@ -150,6 +154,7 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
         return userQuestionVOS;
     }
 
+//    处理
     private UserQuestionPageVO getUserQuestionPageVO(UserQuestion question) {
         UserQuestionPageVO userQuestionPageVO = BeanUtil.copyProperties(question, UserQuestionPageVO.class);
         String appealTypeName = QuestionType.getNameByCode(userQuestionPageVO.getAppealType());

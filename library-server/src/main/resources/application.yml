@@ -9,7 +9,7 @@ spring:
       charset: UTF-8
     multipart:
       enabled: true
-      max-file-size: 2MB
+      max-file-size: 5MB
       max-request-size: 10MB
   data:
     redis:
@@ -38,7 +38,7 @@ mybatis-plus:
       logic-not-delete-value: 1
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   pagination:
     enabled: true
 library:

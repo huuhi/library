@@ -35,7 +35,7 @@ public class UserQuestionController {
     private UserQuestionService userQuestionService;
 
     @PostMapping("/add")
-    @CacheEvict(value = "userQuestion", allEntries = true)
+//    @CacheEvict(value = "userQuestion", allEntries = true)
     @LogActivity(
             type= ActivityType.AUDIT,
             description = "用户{#dto.userId}反馈问题{#dto.note}"
@@ -59,7 +59,7 @@ public class UserQuestionController {
     }
 //    管理员处理用户的问题
     @PostMapping("/workOut")
-    @CacheEvict(value = "userQuestion", allEntries = true)
+//    @CacheEvict(value = "userQuestion", allEntries = true)
     @LogActivity(
             type = ActivityType.AUDIT,
             description = "管理员{#dto.managerId}处理用户的问题{#dto.id}"
@@ -90,9 +90,11 @@ public class UserQuestionController {
     }
 //    根据用户id获取用户的反馈问题
     @GetMapping("/getUserQuestion/{userid}")
-    @Cacheable(value = "userQuestion", key = "#id")
+//    @Cacheable(value = "userQuestion", key = "#id")
     public Result<List<UserQuestionVO>> getUserQuestionByUserId(@PathVariable("userid") Integer id) {
         log.info("根据用户id获取用户的反馈问题：{}",id);
+//        这里是用户在查看自己的信息，需要将状态修改成为已读
+
         List<UserQuestionVO> userQuestion = userQuestionService.getUserQuestionByUserId(id);
         return Result.success(userQuestion);
     }

@@ -3,6 +3,7 @@ package zhijianhu.libraryserver.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import zhijianhu.dto.PostLikeDTO;
 import zhijianhu.entity.PostLike;
@@ -20,8 +21,11 @@ import zhijianhu.libraryserver.service.PostService;
 @Service
 public class PostLikeServiceImpl extends ServiceImpl<PostLikeMapper, PostLike>
     implements PostLikeService {
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
+    @Lazy
+    public PostLikeServiceImpl(PostService postService) {
+        this.postService = postService;
+    }
 
     @Override
     public boolean likePost(PostLikeDTO postDTO) {

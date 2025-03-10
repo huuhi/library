@@ -3,21 +3,20 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zhijianhu.constant.Level;
 import zhijianhu.dto.PostDTO;
 import zhijianhu.entity.*;
 import zhijianhu.libraryserver.mapper.PostsMapper;
-import zhijianhu.libraryserver.service.PostService;
-import zhijianhu.libraryserver.service.PostTagsService;
-import zhijianhu.libraryserver.service.TagsService;
-import zhijianhu.libraryserver.service.UsersService;
+import zhijianhu.libraryserver.service.*;
 import zhijianhu.result.TextResult;
 import zhijianhu.utils.ServiceUtils;
 import zhijianhu.utils.TextModerationPlusDemo;
 import zhijianhu.vo.PostVO;
 import zhijianhu.vo.TagsVO;
+import zhijianhu.vo.UserNameAndImage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,10 +34,12 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     private final PostTagsService postTagsService;
     private final UsersService usersService;
     private final TagsService tagsService;
-    public PostsServiceImpl(PostTagsService postTagsService, UsersService usersService, UsersServiceImpl usersServiceImpl, TagsService tagsService) {
+    private final PostLikeService postLikeService;
+    public PostsServiceImpl(PostTagsService postTagsService, UsersService usersService, UsersServiceImpl usersServiceImpl, TagsService tagsService, PostLikeService postLikeService) {
         this.postTagsService = postTagsService;
         this.usersService = usersService;
         this.tagsService = tagsService;
+        this.postLikeService = postLikeService;
     }
 
     @Override
@@ -109,45 +110,25 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
                 .like(key != null, Posts::getTitle, key)
                 .eq(UserId!=null,Posts::getUserId,UserId)
                 .list();
+        if(posts == null || posts.isEmpty()){
+            return List.of();//说明没有帖子
+        }
         List<PostVO> postVOS = BeanUtil.copyToList(posts, PostVO.class);
 //        批量用户用户id和用户名，方便插入数据
-        Map<Integer, String> Usermap = ServiceUtils.buildEntityMap(
+        Map<Integer, UserNameAndImage> Usermap = ServiceUtils.buildEntityMap(
                 posts,
                 Posts::getUserId,
                 usersService::listByIds,
                 Users::getId,
-                Users::getUsername
-        );
-//        获取帖子id集合
-        Set<Integer> postIds = posts.stream()
-                .map(Posts::getId)
-                .collect(Collectors.toSet());
-
-//      批量获取标签
-        Map<Integer, List<TagsVO>> tagMap = ServiceUtils.buildPostTagMap(
-                postIds,
-                // 定义如何获取帖子-标签关系
-                ids -> postTagsService.lambdaQuery()
-                        .in(PostTags::getPostId, ids)
-                        .list()
-                        .stream()
-                        .collect(Collectors.groupingBy(
-                                PostTags::getPostId,
-                                Collectors.mapping(PostTags::getTagId, Collectors.toList())
-                        )),
-                // 定义如何获取标签详情
-                tagIds -> tagsService.listByIds(tagIds)
-                        .stream()
-                        .collect(Collectors.toMap(
-                                Tags::getId,
-                                t -> new TagsVO(t.getName(), t.getThemeColor())
-                        ))
+                user -> new UserNameAndImage(user.getUsername(), user.getImage())
         );
 
+        Map<Integer, List<TagsVO>> tagMap = initTagMap(posts);
 
         postVOS.forEach(p->{
             Integer userId = p.getUserId();
-            p.setUserName(Usermap.get(userId));
+            p.setUserName(Usermap.get(userId).getUserName());
+            p.setUserImage(Usermap.get(userId).getImage());
 //        private List<TagsVO> tags;
 //
 ////    判断是不是我的帖子
@@ -158,6 +139,35 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
             p.setTags(tagMap.getOrDefault(p.getId(), Collections.emptyList()));
         });
         return postVOS;
+    }
+
+    @Override
+    public PostVO getPostById(Integer id) {
+        Posts post = getById(id);
+        if(post!=null){
+            ArrayList<Posts> list = new ArrayList<>();
+            list.add(post);
+            Map<Integer, List<TagsVO>> tagMap = initTagMap(list);
+            PostVO postVO = BeanUtil.copyProperties(post, PostVO.class);
+            Integer userId = postVO.getUserId();
+            Users user = usersService.getById(userId);
+            postVO.setUserName(user.getUsername());
+            postVO.setUserImage(user.getImage());
+            if(Objects.equals(userId, UserContext.getUserId())){
+                postVO.setIsMy(true);//是我的帖子
+            }
+//            还需要判断是否点赞
+            PostLike one = postLikeService.lambdaQuery()
+                    .eq(PostLike::getPostId, id)
+                    .eq(PostLike::getUserId, UserContext.getUserId())
+                    .one();
+            if(one!=null){
+                postVO.setIsLike(true);
+            }
+            postVO.setTags(tagMap.getOrDefault(postVO.getId(), Collections.emptyList()));
+            return postVO;
+        }
+        return null;
     }
 
     private void updateTag(Integer id,List<Integer> newTags){
@@ -208,6 +218,33 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
 
         //            log.warn("内容说明:{} , 标题说明：{}",textResult.getText(),titleResult.getText()) ;
         return !level.equals(Level.LEVEL_1) || !titleLevel.equals(Level.LEVEL_1);
+    }
+    private Map<Integer,List<TagsVO>> initTagMap(List<Posts> posts){
+//        获取帖子id集合
+        Set<Integer> postIds = posts.stream()
+                .map(Posts::getId)
+                .collect(Collectors.toSet());
+
+//      批量获取标签
+        return ServiceUtils.buildPostTagMap(
+                postIds,
+                // 定义如何获取帖子-标签关系
+                ids -> postTagsService.lambdaQuery()
+                        .in(PostTags::getPostId, ids)
+                        .list()
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                PostTags::getPostId,
+                                Collectors.mapping(PostTags::getTagId, Collectors.toList())
+                        )),
+                // 定义如何获取标签详情
+                tagIds -> tagsService.listByIds(tagIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                Tags::getId,
+                                t -> new TagsVO(t.getName(), t.getThemeColor())
+                        ))
+        );
     }
 
 }

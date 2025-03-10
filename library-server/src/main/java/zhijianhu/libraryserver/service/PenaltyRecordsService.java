@@ -8,6 +8,8 @@ import zhijianhu.entity.PenaltyRecords;
 import zhijianhu.vo.PageVO;
 import zhijianhu.vo.PenaltyRecordVO;
 
+import java.util.List;
+
 /**
 * @author windows
 * @description 针对表【penalty_records(用户违规缴纳罚款记录表)】的数据库操作Service
@@ -20,4 +22,8 @@ public interface PenaltyRecordsService extends IService<PenaltyRecords> {
     PenaltyRecordVO getRecordById(Integer id);
 
     boolean updateRecordById(PenaltyDTO dto);
+
+    boolean payPenalty(Integer id);
+
+    List<PenaltyRecordVO> getRecordByUserId(Integer userId);
 }

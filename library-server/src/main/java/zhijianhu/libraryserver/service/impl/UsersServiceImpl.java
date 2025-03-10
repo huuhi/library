@@ -46,19 +46,22 @@ import java.util.*;
 public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     implements UsersService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-   @Autowired
-   private UsersMapper usersMapper;
-   @Autowired
+   private final UsersMapper usersMapper;
    @Lazy
-   private BooksService booksService;
+   private final BooksService booksService;
 //   因为借阅service注入我的bean,所以这里注入mapper
-    @Autowired
-    private UserQuestionMapper userQuestionService;
+    private final UserQuestionMapper userQuestionService;
 
-    @Autowired
-    private BookClassesService classesService;
-   @Autowired
-   private BorrowRecordsService borrowRecordsService;
+    private final BookClassesService classesService;
+   private final BorrowRecordsService borrowRecordsService;
+
+    public UsersServiceImpl(UsersMapper usersMapper, BooksService booksService, UserQuestionMapper userQuestionService, BookClassesService classesService, BorrowRecordsService borrowRecordsService) {
+        this.usersMapper = usersMapper;
+        this.booksService = booksService;
+        this.userQuestionService = userQuestionService;
+        this.classesService = classesService;
+        this.borrowRecordsService = borrowRecordsService;
+    }
 
     @Override
     public Users login(UserLoginDTO userLoginDTO) {

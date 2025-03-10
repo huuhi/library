@@ -12,6 +12,8 @@ import zhijianhu.result.Result;
 import zhijianhu.vo.PageVO;
 import zhijianhu.vo.PenaltyRecordVO;
 
+import java.util.List;
+
 /**
  * @author 胡志坚
  * @version 1.0
@@ -55,6 +57,21 @@ public class PenaltyRecordController {
         boolean success=penaltyRecordService.updateRecordById(dto);
         return success?Result.success():Result.error(MessageConstant.UPDATE_FAIL);
     }
+//    用户缴纳罚金
+    @PutMapping("/pay/{id}")
+    public Result<Void> payPenalty(@PathVariable("id") Integer id){
+        log.info("用户缴纳罚金：{}",id);
+        boolean success=penaltyRecordService.payPenalty(id);
+        return success?Result.success():Result.error(MessageConstant.UPDATE_FAIL);
+    }
+//    查询当前用户的罚款记录~
+    @GetMapping("/getUser/{userId}")
+    public Result<List<PenaltyRecordVO>> getRecordByUserId(@PathVariable Integer userId){
+        log.info("查询当前用户的罚款记录：{}",userId);
+        List<PenaltyRecordVO> recordByUserId = penaltyRecordService.getRecordByUserId(userId);
+        return Result.success(recordByUserId);
+    }
+
 
 
 

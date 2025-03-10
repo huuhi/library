@@ -13,6 +13,4 @@ public class PenaltyRecordPageDTO {
     private Integer pageNum;
     private Integer pageSize;
     private Integer status;
-
-
 }

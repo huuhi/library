@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.PenaltyDTO;
 import zhijianhu.dto.PenaltyRecordPageDTO;
 import zhijianhu.entity.PenaltyRecords;
@@ -19,6 +20,8 @@ import zhijianhu.vo.PageVO;
 import zhijianhu.vo.PenaltyRecordVO;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author windows
@@ -64,6 +67,30 @@ public class PenaltyRecordsServiceImpl extends ServiceImpl<PenaltyRecordsMapper,
         record.setPenaltyAmount(penaltyAmount);
         record.setNote(note);
         return updateById(record);
+    }
+
+    @Override
+    public boolean payPenalty(Integer id) {
+        PenaltyRecords penaltyRecord = getById(id);
+        penaltyRecord.setStatus(StatusConstant.ENABLE);
+        return updateById(penaltyRecord);
+    }
+
+    @Override
+    public List<PenaltyRecordVO> getRecordByUserId(Integer userId) {
+        List<PenaltyRecords> list = lambdaQuery().
+                eq(PenaltyRecords::getUserId, userId)
+                .list();
+        if(list==null||list.isEmpty()){
+            return List.of();
+        }
+        List<PenaltyRecordVO> penaltyRecordVOS=new ArrayList<>();
+        list.forEach(p->{
+            PenaltyRecordVO penaltyRecordVO = turnToPenaltyRecordVO(p);
+            penaltyRecordVOS.add(penaltyRecordVO);
+        });
+
+        return penaltyRecordVOS;
     }
 
     private PenaltyRecordVO turnToPenaltyRecordVO(PenaltyRecords record){

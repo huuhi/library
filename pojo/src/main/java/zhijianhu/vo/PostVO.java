@@ -20,6 +20,8 @@ public class PostVO {
 
     private String userName;
 
+    private String userImage;
+
     private String title;
 
     private String content;
@@ -37,5 +39,7 @@ public class PostVO {
     private List<TagsVO> tags;
 
 //    判断是不是我的帖子
-    private Boolean isMy;
+    private Boolean isMy=false;
+
+    private Boolean isLike=false;
 }

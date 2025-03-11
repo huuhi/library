@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public enum ActivityType {
     BORROW(1, "借阅", "primary"),
-    AUDIT(2, "审核", "success"),
+    AUDIT(2, "发帖", "success"),
     OVERDUE(3, "逾期", "warning"),
     SYSTEM(4, "系统", "info"),
     DAMAGE(5, "损坏", "danger");

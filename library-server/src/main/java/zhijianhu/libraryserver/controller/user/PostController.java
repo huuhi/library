@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.PostDTO;
+import zhijianhu.enumPojo.ActivityType;
+import zhijianhu.libraryserver.annotation.LogActivity;
 import zhijianhu.libraryserver.service.PostService;
 import zhijianhu.result.Result;
 import zhijianhu.vo.PostVO;
@@ -28,6 +30,10 @@ public class PostController {
 
     //    首先是发帖子
     @PostMapping("/send")
+    @LogActivity(
+            type= ActivityType.AUDIT,
+            description="#{postDTO.getUserId}发布了帖子"
+    )
     public Result<Void> sendPost(@RequestBody PostDTO postDTO){
         log.info("发送帖子");
         boolean success=postService.sendPost(postDTO);

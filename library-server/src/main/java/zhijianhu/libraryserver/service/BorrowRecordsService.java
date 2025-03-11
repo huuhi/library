@@ -37,4 +37,6 @@ public interface BorrowRecordsService extends IService<BorrowRecords> {
     Integer getLendCountByMonth(LocalDate first, LocalDate last);
 
     Integer getReturnCountByMonth(LocalDate first, LocalDate last);
+
+    Boolean checkBorrowReturnTime();
 }

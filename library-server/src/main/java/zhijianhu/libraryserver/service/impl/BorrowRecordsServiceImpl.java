@@ -250,6 +250,13 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
             .count()
             .intValue();
     }
+
+    @Override
+    public Boolean checkBorrowReturnTime() {
+
+
+        return null;
+    }
 //
 
 

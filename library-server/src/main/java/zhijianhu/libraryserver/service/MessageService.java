@@ -15,4 +15,8 @@ import java.util.List;
 public interface MessageService extends IService<Message> {
 
     List<MessageVO> getLikeMessageByUserId(Integer userId);
+
+    List<MessageVO> getReviewMessageByUserId(Integer id);
+
+    Integer getNotReadCount(Integer userId,Integer type);
 }

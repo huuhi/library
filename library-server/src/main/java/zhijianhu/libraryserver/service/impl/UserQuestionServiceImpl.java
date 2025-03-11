@@ -17,6 +17,7 @@ import zhijianhu.enumPojo.IsRead;
 import zhijianhu.enumPojo.QuestionType;
 import zhijianhu.enumPojo.StatusType;
 import zhijianhu.libraryserver.mapper.UserQuestionMapper;
+import zhijianhu.libraryserver.service.MessageService;
 import zhijianhu.libraryserver.service.UserQuestionService;
 import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
@@ -41,8 +42,13 @@ import java.util.stream.Collectors;
 @Service
 public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, UserQuestion>
     implements UserQuestionService {
-    @Autowired
-    private UsersService userService;
+    private final UsersService userService;
+    private final MessageService messageService;
+
+    public UserQuestionServiceImpl(MessageService messageService, UsersService userService) {
+        this.messageService = messageService;
+        this.userService = userService;
+    }
 
 
     @Override
@@ -112,10 +118,13 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
 
     @Override
     public Integer countUnread(Integer id) {
+/**     3.11 对此接口进行修改
+ *         添加消息列表中未读数量
+ */
         return lambdaQuery()
                 .eq(UserQuestion::getUserId, id)
                 .eq(UserQuestion::getIsReadStatus, StatusConstant.ENABLE)
-                .count().intValue();
+                .count().intValue()+messageService.getNotReadCount(id,null);
     }
 
     @Override

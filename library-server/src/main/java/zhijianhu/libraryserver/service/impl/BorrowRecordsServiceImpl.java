@@ -1,6 +1,7 @@
 package zhijianhu.libraryserver.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -30,10 +31,7 @@ import zhijianhu.vo.PageVO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -48,12 +46,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, BorrowRecords>
     implements BorrowRecordsService {
-    @Autowired
-    private BooksMapper booksService;
-    @Autowired
-    private UsersMapper usersService;
-    @Autowired
-    private PenaltyRecordsService penaltyRecordsService;
+    private final BooksMapper booksService;
+    private final UsersMapper usersService;
+    private final PenaltyRecordsService penaltyRecordsService;
+    private final BorrowRecordsMapper borrowerRecordMapper;
+
+    public BorrowRecordsServiceImpl(BooksMapper booksService, UsersMapper usersService, PenaltyRecordsService penaltyRecordsService, BorrowRecordsMapper borrowerRecordMapper) {
+        this.booksService = booksService;
+        this.usersService = usersService;
+        this.penaltyRecordsService = penaltyRecordsService;
+        this.borrowerRecordMapper = borrowerRecordMapper;
+    }
 
 
     @Override
@@ -253,9 +256,20 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
 
     @Override
     public Boolean checkBorrowReturnTime() {
-
-
-        return null;
+        List<BorrowRecords> list= borrowerRecordMapper.check();
+        if(list==null||list.isEmpty()){
+            return false;//表示没有
+        }
+//        获取主键id
+        List<Integer> BorrowId = list.stream()
+                .map(BorrowRecords::getId)
+                .toList();
+//        如果有，批量修改
+        LambdaUpdateWrapper<BorrowRecords> wrapper = new LambdaUpdateWrapper<>();
+        wrapper
+                .in(BorrowRecords::getId,BorrowId)
+                .set(BorrowRecords::getStatus,StatusConstant.ILLEGAL);
+        return update(wrapper);
     }
 //
 

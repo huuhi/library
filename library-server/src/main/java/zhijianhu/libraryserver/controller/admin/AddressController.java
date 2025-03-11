@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.AddressPageDTO;
 import zhijianhu.entity.StorageAddress;
 import zhijianhu.libraryserver.annotation.OperateLog;
@@ -60,21 +61,21 @@ public class AddressController {
     @OperateLog
     public Result<Void> updateAddress(@RequestBody StorageAddress address) {
         boolean save = storageAddressService.updateById(address);
-        return save? Result.success(): Result.error("修改失败");
+        return save? Result.success(): Result.error(MessageConstant.UPDATE_FAIL);
     }
 //    新增地址
     @PostMapping("/add")
     @CacheEvict(value="addressList",allEntries=true)
     public Result<Void> addAddress(@RequestBody StorageAddress address) {
         boolean save = storageAddressService.save(address);
-        return save? Result.success(): Result.error("新增失败");
+        return save? Result.success(): Result.error(MessageConstant.ADD_FAIL);
     }
     @DeleteMapping("/delete/{id}")
     @CacheEvict(value="addressList",allEntries=true)
     @OperateLog
     public Result<Void> deleteAddress(@PathVariable("id") Integer id) {
         boolean remove = storageAddressService.removeById(id);
-        return remove? Result.success() : Result.error("删除失败");
+        return remove? Result.success() : Result.error(MessageConstant.DELETE_FAIL);
     }
 
 

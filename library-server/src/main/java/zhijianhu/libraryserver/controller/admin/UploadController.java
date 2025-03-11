@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.result.Result;
 import zhijianhu.utils.AliOssUtil;
 
@@ -35,7 +36,7 @@ public class UploadController {
 //            生成随机文件名
         } catch (IOException e) {
             log.error("上传失败", e);
-            return Result.error("上传失败");
+            return Result.error(MessageConstant.UPLOAD_FAIL);
         } catch (ClientException e) {
             log.error("上传失败", e);
             throw new RuntimeException(e);

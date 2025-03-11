@@ -64,7 +64,7 @@ public class BorrowController {
     public Result<Void> updateStatus(@RequestBody BorrowDTO borrowDTO){
         log.info("修改借阅记录：{}",borrowDTO);
         Boolean success = borrowService.updateStatus(borrowDTO);
-        return success ? Result.success() : Result.error("修改状态失败");
+        return success ? Result.success() : Result.error(MessageConstant.UPDATE_FAIL);
     }
     //续借
     @PostMapping("/renew/{id}")
@@ -80,7 +80,7 @@ public class BorrowController {
     public Result<Void> deleteBorrowRecord(@PathVariable("id") List<Integer> ids){
         log.info("删除借阅记录: {}",ids);
         boolean b = borrowService.removeBatchByIds(ids);
-        return b ? Result.success() : Result.error("删除借阅记录失败");
+        return b ? Result.success() : Result.error(MessageConstant.DELETE_FAIL);
     }
 
 }

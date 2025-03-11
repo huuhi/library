@@ -172,6 +172,10 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
 
     private void updateTag(Integer id,List<Integer> newTags){
 //          List<Integer> newTags = postDTO.getTagsId();
+        if(newTags==null||newTags.isEmpty()||newTags.contains(null)){
+            log.debug("不需要更新标签");
+            return;//不需要更新标签
+        }
         log.debug("更新标签, id:{},新加标签id:{}",id,newTags);
         //获取旧标签
         List<Integer> oldTags = postTagsService.lambdaQuery()

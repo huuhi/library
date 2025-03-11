@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.ClassDTO;
 import zhijianhu.dto.ClassPageDTO;
 import zhijianhu.entity.BookClasses;
@@ -66,7 +67,7 @@ public class BookClassController {
         log.info("添加分类,bookClasses={}",bookClassDTO);
         BookClasses bookClasses = BeanUtil.copyProperties(bookClassDTO, BookClasses.class);
         boolean save = bookClassesService.save(bookClasses);
-        return save? Result.success("添加成功") : Result.error("添加失败");
+        return save? Result.success(MessageConstant.ADD_SUCCESS) : Result.error(MessageConstant.ADD_FAIL);
     }
 //    修改分类
     @PutMapping("/update")
@@ -74,7 +75,7 @@ public class BookClassController {
     public Result<String> updateClazz(@RequestBody BookClasses bookClasses){
         log.info("修改分类,bookClasses={}",bookClasses);
         boolean update = bookClassesService.updateById(bookClasses);
-        return update? Result.success("修改成功") : Result.error("修改失败");
+        return update? Result.success(MessageConstant.UPDATE_SUCCESS) : Result.error(MessageConstant.UPDATE_FAIL);
     }
     //    删除分类
     @DeleteMapping("/{id}")
@@ -83,7 +84,7 @@ public class BookClassController {
     public Result<String> deleteClazz(@PathVariable("id") Integer id){
         log.info("删除分类,id={}",id);
         boolean remove = bookClassesService.removeById(id);
-        return remove? Result.success("删除成功") : Result.error("删除失败");
+        return remove? Result.success(MessageConstant.DELETE_SUCCESS) : Result.error(MessageConstant.DELETE_FAIL);
     }
 
 }

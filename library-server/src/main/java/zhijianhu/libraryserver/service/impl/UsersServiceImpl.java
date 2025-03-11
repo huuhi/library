@@ -29,6 +29,8 @@ import org.springframework.stereotype.Service;
 import zhijianhu.query.PageQuery;
 import zhijianhu.vo.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
@@ -176,32 +178,20 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     @Override
     public AdminStatisticsVO getAdminStatistics(Integer adminId) {
         //总用户数量
-        int count = lambdaQuery().count().intValue();//解决
+        int totalUsers = lambdaQuery().count().intValue();//解决
 //        用户增长率是 总用户数跟上个月的用户数量相比较
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastMonth = now.minusMonths(1);
-        int lastMonthCount = lambdaQuery()
+        double userGrowth = getUserGrowth(lambdaQuery()
                 .between(Users::getRegTime, lastMonth, now)
-                .count().intValue();
-        Double userGrowth = (double) (count - lastMonthCount) / lastMonthCount;
+                .count(), totalUsers);
+
 //        总图书
-        int bookTotal = booksService.lambdaQuery().count().intValue();
-//         获取上个月添加的图书
-        int lastMonthBookCount = booksService.lambdaQuery()
-                .between(Books::getCreateTime, lastMonth, now)
-                .count().intValue();
-        Double bookGrowth = (double) (bookTotal - lastMonthBookCount) / lastMonthBookCount;
-//        获取本月借阅量
-        LocalDate localDate = LocalDate.now();
-        LocalDate lastMonthDate = localDate.minusMonths(1);
-        Long borrowCount = borrowRecordsService
-                .lambdaQuery()
-                .between(BorrowRecords::getLendTime, lastMonthDate, localDate)
-                .count();
-//        获取借阅总数
-        Long totalBorrowCount = borrowRecordsService.count();
-//        计算这个月的借阅增长率
-        Double borrowGrowth = (double) (borrowCount - totalBorrowCount) / totalBorrowCount;
+        int totalBooks = (int) booksService.count();
+// 上个月的总图书数
+        double bookGrowth = getBookGrowth(totalBooks);
+//        获取借阅增长率
+        double borrowGrowth= getBorrowBalance();
 
 //        获取已解决问题数量
         Long solveCount = userQuestionService.selectCount(
@@ -209,21 +199,43 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
                         .eq("status", StatusConstant.ENABLE)
                         .eq("manager_id", adminId)
         );
-//        获取所有问题
-        Integer allCount = userQuestionService.getAllCount();
+
 //        问题解决率
-        Double issueResolutionRate = (double) solveCount / allCount;
+        Double issueResolutionRate =getSolveRate(solveCount);
+
+        Long borrowCount = borrowRecordsService.lambdaQuery().between(BorrowRecords::getLendTime, lastMonth, now).count();
+
         return AdminStatisticsVO.builder()
                 .bookGrowth(bookGrowth)
                 .borrowGrowth(borrowGrowth)
                 .issueResolutionRate(issueResolutionRate)
-                .totalUsers(count)
+                .totalUsers(totalUsers)
                 .monthlyBorrows(borrowCount.intValue())
                 .resolvedIssues(solveCount.intValue())
-                .totalBooks(bookTotal)
+                .totalBooks(totalBooks)
                 .userGrowth(userGrowth)
                 .build();
+    }
 
+    private double getBookGrowth(int totalBooks) {
+        LocalDateTime startOfLastMonth = LocalDateTime.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+        int lastMonthTotalBooks = booksService.lambdaQuery()
+                .lt(Books::getCreateTime, startOfLastMonth)  // 统计上个月之前创建的图书
+                .count().intValue();
+        // 图书增长率 = (当前总数 - 上个月总数) / 上个月总数
+        double bookGrowth = lastMonthTotalBooks == 0 ? 0 : (double) (totalBooks - lastMonthTotalBooks) / lastMonthTotalBooks;
+        return setTwoScale(bookGrowth);
+    }
+
+    private double getUserGrowth(Long lastMonth, int totalUsers) {
+        int lastMonthTotal = lastMonth.intValue();
+//        Double userGrowth = (double) (count - lastMonthCount) / lastMonthCount;
+
+//        保留俩位小数
+// 用户增长率 = (当前总数 - 上个月总数) / 上个月总数
+        double userGrowth = lastMonthTotal == 0 ? 0 : (double) (totalUsers - lastMonthTotal) / lastMonthTotal;
+        userGrowth = setTwoScale(userGrowth);
+        return userGrowth;
     }
 
     @Override
@@ -274,6 +286,38 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
             list.add(new BookCategoryStatVO(name,count));
         }
         return list;
+    }
+    private double setTwoScale(double value){
+       return new BigDecimal(value).setScale(2, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    private double getBorrowBalance() {
+//        获取借阅增长率
+                // 本月借阅量
+        LocalDate startOfThisMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endOfThisMonth = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+        Long thisMonthBorrows = borrowRecordsService.lambdaQuery()
+                .between(BorrowRecords::getLendTime, startOfThisMonth, endOfThisMonth)
+                .count();
+
+        // 上个月借阅量
+        LocalDate startOfLastMonth = LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endOfLastMonth = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+        Long lastMonthBorrows = borrowRecordsService.lambdaQuery()
+                .between(BorrowRecords::getLendTime, startOfLastMonth, endOfLastMonth)
+                .count();
+
+        // 借阅增长率 = (本月借阅量 - 上月借阅量) / 上月借阅量
+        double borrowGrowth = lastMonthBorrows == 0 ? 0 : (double) (thisMonthBorrows - lastMonthBorrows) / lastMonthBorrows;
+        return setTwoScale(borrowGrowth);
+    }
+    private double getSolveRate(Long solveCount){
+//        获取问题解决率
+
+        Long allCount = Long.valueOf(userQuestionService.getAllCount());  // 确保返回 Long
+
+        double issueResolutionRate = allCount == 0 ? 0 : (double) solveCount / allCount;
+        return setTwoScale(issueResolutionRate);
     }
 
 

@@ -22,7 +22,7 @@ public class BorrowTask {
     }
 
 //    明天18:00执行一次，检查借阅时间是否超过应还时间
-    @Scheduled(cron = "* * 18 * * ? *")
+    @Scheduled(cron = "0 0 18 * * ? ")
     public void CheckBorrowReturnTime(){
         log.info("检查借阅记录是否有违规未还");
         Boolean is= borrowRecordsService.checkBorrowReturnTime();

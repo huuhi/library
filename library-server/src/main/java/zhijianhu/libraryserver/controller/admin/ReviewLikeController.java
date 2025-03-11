@@ -3,6 +3,7 @@ package zhijianhu.libraryserver.controller.admin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.ReviewLikeDTO;
 import zhijianhu.libraryserver.service.ReviewLikeService;
 import zhijianhu.result.Result;
@@ -25,13 +26,13 @@ public class ReviewLikeController {
     public Result<Void> likeReview(@RequestBody ReviewLikeDTO review){
          log.info("点赞评论:{}", review);
          boolean success = reviewLikeService.likeReview(review);
-         return success? Result.success() : Result.error("点赞失败");
+         return success? Result.success() : Result.error(MessageConstant.LIKE_POST_FAILURE);
     }
     @DeleteMapping("/cancel-like/{reviewId}/{userId}")
     public Result<Void> cancelLikeReview(@PathVariable("reviewId") Integer reviewId,
                                          @PathVariable("userId") Integer userId){
         log.info("取消点赞评论:{},{}", reviewId, userId);
         boolean success = reviewLikeService.cancelLikeReview(reviewId, userId);
-         return success? Result.success() : Result.error("取消点赞失败");
+         return success? Result.success() : Result.error(MessageConstant.UNLIKE_POST_FAILURE);
     }
 }

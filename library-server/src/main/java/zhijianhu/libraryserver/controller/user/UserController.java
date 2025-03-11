@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.JwtClaimsConstant;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.UserChangePasswordDTO;
 import zhijianhu.dto.UserDTO;
 import zhijianhu.dto.UserLoginDTO;
@@ -71,7 +72,7 @@ public class UserController {
     public Result<Void> register(@RequestBody UserDTO userDTO) {
         log.info("用户注册：{}", userDTO);
         boolean result = usersService.register(userDTO);
-        return result?Result.success():Result.error("注册失败");
+        return result?Result.success():Result.error(MessageConstant.REGISTER_FAIL);
     }
 //    修改用户信息
     @PutMapping
@@ -80,7 +81,7 @@ public class UserController {
         log.info("修改用户信息：{}", userDTO);
         Users users = BeanUtil.copyProperties(userDTO, Users.class);
         boolean b = usersService.updateById(users);
-        return b?Result.success():Result.error("修改失败");
+        return b?Result.success():Result.error(MessageConstant.UPDATE_FAIL);
     }
 //   修改状态
     @PutMapping("/status/{status}")
@@ -90,7 +91,7 @@ public class UserController {
                                @RequestParam(value = "violationReason" , required = false) String violationReason){
         log.info("修改用户状态：{}", status);
         boolean b= usersService.updateStatus(status,id,violationReason);
-        return b?Result.success():Result.error("修改失败");
+        return b?Result.success():Result.error(MessageConstant.UPDATE_FAIL);
     }
 //    修改密码
     @PutMapping("/password")
@@ -98,7 +99,7 @@ public class UserController {
     public Result<Void> updatePassword(@RequestBody UserChangePasswordDTO userChangePasswordDTO){
         log.info("修改用户密码：{}",userChangePasswordDTO.getId());
         Boolean b= usersService.updatePassword(userChangePasswordDTO);
-        return b?Result.success():Result.error("修改失败");
+        return b?Result.success():Result.error(MessageConstant.UPDATE_FAIL);
     }
 //    分页查询
     @GetMapping("/list")
@@ -130,7 +131,7 @@ public class UserController {
     public Result<Void> updateConfine(@PathVariable("confine") Integer confine,
                                @RequestParam("id") Integer id){
         Boolean success= usersService.updateConfine(confine,id);
-        return success?Result.success():Result.error("修改失败");
+        return success?Result.success():Result.error(MessageConstant.UPDATE_FAIL);
     }
 //    用户退出登录应该删除用户id
     @PutMapping("/exit/{id}")

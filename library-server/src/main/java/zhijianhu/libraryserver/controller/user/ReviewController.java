@@ -3,6 +3,7 @@ package zhijianhu.libraryserver.controller.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.ExamineReviewDTO;
 import zhijianhu.dto.GetReviewDTO;
@@ -37,7 +38,7 @@ public class ReviewController {
     public Result<Void> sendReview(@RequestBody ReviewDTO reviewDTO){
         log.info("发表评论:{}", reviewDTO);
         Boolean  success= reviewService.sendReview(reviewDTO);
-        return success? Result.success() : Result.error("评论疑似违规，等待管理员审核");
+        return success? Result.success() : Result.error(MessageConstant.REVIEW_ILLEGAL);
     }
     @GetMapping("/get")
     public Result<List<ReviewVO>> getReviewByBookId(@ModelAttribute GetReviewDTO dto){
@@ -51,7 +52,7 @@ public class ReviewController {
     public Result<Void> deleteReview(@PathVariable("id") Integer id){
         log.info("删除评论:{}", id);
         boolean delete= reviewService.completeRemove(id);
-        return delete? Result.success() : Result.error("删除评论失败");
+        return delete? Result.success() : Result.error(MessageConstant.DELETE_FAIL);
     }
 //    管理员审核评论
     @PutMapping("/audit")
@@ -62,7 +63,7 @@ public class ReviewController {
     public Result<Void> auditReview(@RequestBody ExamineReviewDTO reviewDTO){
         log.info("审核评论:{}", reviewDTO);
         boolean success= reviewService.auditReview(reviewDTO);
-        return success? Result.success() : Result.error("审核评论失败");
+        return success? Result.success() : Result.error(MessageConstant.UPDATE_FAIL);
     }
 //    分页查询评论
     @GetMapping("/page")

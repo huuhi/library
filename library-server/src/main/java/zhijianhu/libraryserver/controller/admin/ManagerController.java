@@ -31,29 +31,33 @@ public class ManagerController {
 
     @GetMapping("/info")
     public Result<AdminInfoVO> getAdminInfo() {
+//        获取管理员的基本信息
         Integer adminId = UserContext.getUserId();
         AdminInfoVO adminInfoVO = usersService.getAdminInfo(adminId);
         return Result.success(adminInfoVO);
     }
     @GetMapping("/statistics")
     public Result<AdminStatisticsVO> getAdminStatistics() {
-        // 从当前登录用户获取管理员ID
+        // 从当前登录用户获取管理员ID,获取统计数据
         Integer adminId = UserContext.getUserId();
         AdminStatisticsVO statistics = usersService.getAdminStatistics(adminId);
         return Result.success(statistics);
     }
     @GetMapping("/borrowing-trends")
     public Result<BorrowingTrendsVO> getBorrowingTrends(@RequestParam(defaultValue = "6") Integer months) {
+//        获取借阅统计信息
         BorrowingTrendsVO trendsData = usersService.getBorrowingTrends(months);
         return Result.success(trendsData);
     }
     @GetMapping("/book-categories")
     public Result<List<BookCategoryStatVO>> getBookCategoryStats() {
+//        获取图书分类统计信息
         List<BookCategoryStatVO> categoryStats = usersService.getBookCategoryStats();
         return Result.success(categoryStats);
     }
     @GetMapping("/activity/recent")
     public Result<List<ActivityVO>> getRecentActivities(@RequestParam(defaultValue = "5") Integer limit) {
+//        获取近期活动~
         List<ActivityVO> recentActivities = activityService.getRecentActivities(limit);
         return Result.success(recentActivities);
     }

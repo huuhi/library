@@ -1,7 +1,11 @@
 package zhijianhu.libraryserver.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
 import zhijianhu.entity.BorrowRecords;
+
+import java.time.LocalDate;
+import java.util.List;
 
 
 /**
@@ -12,6 +16,8 @@ import zhijianhu.entity.BorrowRecords;
 */
 public interface BorrowRecordsMapper extends BaseMapper<BorrowRecords> {
 
+    @Select("select * from borrow_records where status=1 and must_return_time<now();")
+    List<BorrowRecords> check();
 }
 
 

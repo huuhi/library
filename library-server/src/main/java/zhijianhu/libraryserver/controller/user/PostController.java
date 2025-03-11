@@ -31,9 +31,10 @@ public class PostController {
     //    首先是发帖子
     @PostMapping("/send")
     @LogActivity(
-            type= ActivityType.AUDIT,
-            description="#{postDTO.getUserId}发布了帖子"
+        type = ActivityType.AUDIT,
+        description = "#{postDTO?.getUserId ?: '未知用户'} 发布了帖子"
     )
+
     public Result<Void> sendPost(@RequestBody PostDTO postDTO){
         log.info("发送帖子");
         boolean success=postService.sendPost(postDTO);

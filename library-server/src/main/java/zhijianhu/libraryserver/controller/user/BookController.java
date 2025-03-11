@@ -3,6 +3,7 @@ package zhijianhu.libraryserver.controller.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import zhijianhu.constant.MessageConstant;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.BookDTO;
 import zhijianhu.dto.BookPageDTO;
@@ -47,20 +48,20 @@ public class BookController {
     public Result<Void> addBook(@RequestBody BookDTO book) {
         log.info("addBook: book={}", book);
         boolean success = bookService.addBook(book);
-        return success ? Result.success() : Result.error("添加图书失败");
+        return success ? Result.success() : Result.error(MessageConstant.ADD_FAIL);
     }
 
     @GetMapping("/{id}")
     public Result<BookVO> getBookById(@PathVariable Integer id) {
         log.info("getBookById: id={}", id);
         BookVO book = bookService.getBookById(id);
-        return book != null ? Result.success(book) : Result.error("图书不存在");
+        return book != null ? Result.success(book) : Result.error(MessageConstant.NOT_EXIST);
     }
 
     @PutMapping("/change")
     public Result<Void> changeBook(@RequestBody BookVO book) {
        boolean success =  bookService.changeBook(book);
-       return success ? Result.success() : Result.error("修改图书失败");
+       return success ? Result.success() : Result.error(MessageConstant.UPDATE_FAIL);
     }
 //    借书 以及 还书
     @PutMapping("/status")
@@ -76,7 +77,7 @@ public class BookController {
             log.info("还书：{}",dto);
         }
         boolean success = bookService.changeBookStatus(dto);
-        return success ? Result.success() : Result.error("借书已达上限");
+        return success ? Result.success() : Result.error(MessageConstant.UPPER_LIMIT);
     }
     @DeleteMapping("/{id}")
     @LogActivity(
@@ -87,7 +88,7 @@ public class BookController {
     public Result<Void> deleteBook(@PathVariable("id") List<Integer> ids) {
         log.info("deleteBook: id={}", ids);
         boolean b = bookService.removeBatchByIds(ids);
-        return b ? Result.success() : Result.error("删除图书失败");
+        return b ? Result.success() : Result.error(MessageConstant.DELETE_FAIL);
 
     }
 

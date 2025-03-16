@@ -3,12 +3,9 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import zhijianhu.constant.MessageConstant;
@@ -21,7 +18,6 @@ import zhijianhu.entity.*;
 import zhijianhu.exception.AccountLockedException;
 import zhijianhu.exception.AccountNotFoundException;
 import zhijianhu.exception.PasswordErrorException;
-import zhijianhu.libraryserver.mapper.BorrowRecordsMapper;
 import zhijianhu.libraryserver.mapper.UserQuestionMapper;
 import zhijianhu.libraryserver.service.*;
 import zhijianhu.libraryserver.mapper.UsersMapper;
@@ -34,7 +30,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
@@ -49,14 +44,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     implements UsersService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
    private final UsersMapper usersMapper;
-   @Lazy
    private final BooksService booksService;
 //   因为借阅service注入我的bean,所以这里注入mapper
     private final UserQuestionMapper userQuestionService;
 
     private final BookClassesService classesService;
    private final BorrowRecordsService borrowRecordsService;
-
+   @Lazy
     public UsersServiceImpl(UsersMapper usersMapper, BooksService booksService, UserQuestionMapper userQuestionService, BookClassesService classesService, BorrowRecordsService borrowRecordsService) {
         this.usersMapper = usersMapper;
         this.booksService = booksService;

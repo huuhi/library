@@ -1,7 +1,6 @@
 package zhijianhu.libraryserver.controller.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.constant.StatusConstant;
@@ -31,9 +30,13 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/review")
 public class ReviewController {
-    @Autowired
-    private ReviewService reviewService;
-//    发表评论
+    private final ReviewService reviewService;
+
+    public ReviewController(ReviewService reviewService) {
+        this.reviewService = reviewService;
+    }
+
+    //    发表评论
     @PostMapping("/send")
     public Result<Void> sendReview(@RequestBody ReviewDTO reviewDTO){
         log.info("发表评论:{}", reviewDTO);
@@ -84,7 +87,4 @@ public class ReviewController {
         PageVO<ReviewPageVO> pageVO = reviewService.getReviewByPage(dto);
         return Result.success(pageVO);
     }
-
-
-
 }

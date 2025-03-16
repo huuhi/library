@@ -2,7 +2,6 @@ package zhijianhu.libraryserver.controller.user;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +27,11 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/class")
 public class BookClassController {
-    @Autowired
-    private BookClassesService bookClassesService;
+    private final BookClassesService bookClassesService;
+
+    public BookClassController(BookClassesService bookClassesService) {
+        this.bookClassesService = bookClassesService;
+    }
 
     @GetMapping
     @Cacheable(value = "clazz", key = "'boss'")

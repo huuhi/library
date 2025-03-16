@@ -5,7 +5,8 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.constant.StatusConstant;
@@ -13,6 +14,8 @@ import zhijianhu.dto.BookDTO;
 import zhijianhu.dto.BookPageDTO;
 import zhijianhu.dto.ChangeBookStatusDTO;
 import zhijianhu.entity.Books;
+import zhijianhu.entity.Publish;
+import zhijianhu.entity.StorageAddress;
 import zhijianhu.exception.LendFileException;
 import zhijianhu.libraryserver.mapper.BooksMapper;
 import zhijianhu.libraryserver.service.*;
@@ -38,6 +41,7 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
     private final BorrowRecordsService borrowRecordsService;
     private final PublishService publishService;
 
+    @Lazy
     public BooksServiceImpl(BookClassesService bookClassesService, StorageAddressService storageAddressService, BorrowRecordsService borrowRecordsService, PublishService publishService) {
         this.bookClassesService = bookClassesService;
         this.storageAddressService = storageAddressService;
@@ -72,25 +76,36 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
                 )
                .in(categoryIds!=null, Books::getClazzId,categoryIds)
                 .page(page);
-        return PageVO.of(booksPage, book -> {
-            Integer addressId = book.getAddressId();
-            Integer clazzId = book.getClazzId();
-            Integer status1 = book.getStatus();
-            Integer publishId = book.getPublishId();
-            String address = storageAddressService.getById(addressId).getAddress();
-            String fullPath = bookClassesService.getFullPath(clazzId);
-            String publishName = publishService.getById(publishId).getName();
-            BookVO bookVO = BeanUtil.copyProperties(book, BookVO.class);
-            bookVO.setAddress(address);
-            bookVO.setClazz(fullPath);
-            bookVO.setPublish(publishName);
-            if(Objects.equals(status1, StatusConstant.ENABLE)){
-                bookVO.setStatus("可借");
-            }else{
-                bookVO.setStatus("已借出");
-            }
-            return bookVO;
-        });
+        return PageVO.of(booksPage, this::getBookVO);
+    }
+
+    @NotNull
+    private BookVO getBookVO(Books book) {
+        Integer addressId = book.getAddressId();
+        Integer clazzId = book.getClazzId();
+        Integer status1 = book.getStatus();
+        Integer publishId = book.getPublishId();
+        StorageAddress storageAddress = storageAddressService.getById(addressId);
+        String address ="未知地址";
+        if(storageAddress!=null){
+            address=storageAddress.getAddress();
+        }
+        String fullPath = bookClassesService.getFullPath(clazzId);
+        Publish publish = publishService.getById(publishId);
+        String publishName = "未知出版社";
+        if(publish!=null){
+            publishName=publish.getName();
+        }
+        BookVO bookVO = BeanUtil.copyProperties(book, BookVO.class);
+        bookVO.setAddress(address);
+        bookVO.setClazz(fullPath);
+        bookVO.setPublish(publishName);
+        if(Objects.equals(status1, StatusConstant.ENABLE)){
+            bookVO.setStatus("可借");
+        }else{
+            bookVO.setStatus("已借出");
+        }
+        return bookVO;
     }
 
     @Override
@@ -103,23 +118,7 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
     @Override
     public BookVO getBookById(Integer id) {
         Books book = getById(id);
-        Integer addressId = book.getAddressId();
-        Integer clazzId = book.getClazzId();
-        Integer status1 = book.getStatus();
-        Integer publishId = book.getPublishId();
-        String address = storageAddressService.getById(addressId).getAddress();
-        String fullPath = bookClassesService.getFullPath(clazzId);
-        String publishName = publishService.getById(publishId).getName();
-        BookVO bookVO = BeanUtil.copyProperties(book, BookVO.class);
-        bookVO.setAddress(address);
-        bookVO.setClazz(fullPath);
-        bookVO.setPublish(publishName);
-        if(Objects.equals(status1, StatusConstant.ENABLE)){
-            bookVO.setStatus("可借");
-        }else{
-            bookVO.setStatus("已借出");
-        }
-        return bookVO;
+        return getBookVO(book);
     }
 
     @Override

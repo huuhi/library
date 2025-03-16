@@ -2,6 +2,7 @@ package zhijianhu.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  * 说明:
  */
 @Data
-public class ActivityVO {
+public class ActivityVO implements Serializable {
     private Long id;           // 活动ID
     private String type;       // 活动类型（primary, success, warning, info, danger）
     private String content;    // 活动内容

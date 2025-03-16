@@ -1,7 +1,6 @@
 package zhijianhu.libraryserver.controller.admin;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +25,14 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/address")
 public class AddressController {
-    @Autowired
-    private StorageAddressService storageAddressService;
+    private final StorageAddressService storageAddressService;
+
+    public AddressController(StorageAddressService storageAddressService) {
+        this.storageAddressService = storageAddressService;
+    }
 
 
-//  获取所有地址信息
+    //  获取所有地址信息
     @GetMapping("/get")
     @Cacheable(value="addressList",key="'all'")
     public Result<List<AddressVO>> getAddress() {

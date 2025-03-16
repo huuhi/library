@@ -2,7 +2,6 @@ package zhijianhu.libraryserver.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Select;
 import zhijianhu.entity.Activity;
 import zhijianhu.vo.ActivityVO;
 

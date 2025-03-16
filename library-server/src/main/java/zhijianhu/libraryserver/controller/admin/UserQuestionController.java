@@ -1,9 +1,6 @@
 package zhijianhu.libraryserver.controller.admin;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.AddUserQuestionDTO;
@@ -31,8 +28,11 @@ import java.util.List;
 @Slf4j
 public class UserQuestionController {
 
-    @Autowired
-    private UserQuestionService userQuestionService;
+    private final UserQuestionService userQuestionService;
+
+    public UserQuestionController(UserQuestionService userQuestionService) {
+        this.userQuestionService = userQuestionService;
+    }
 
     @PostMapping("/add")
 //    @CacheEvict(value = "userQuestion", allEntries = true)
@@ -102,6 +102,7 @@ public class UserQuestionController {
     public Result<PageVO<UserQuestionPageVO>> getPendingFeedbacks(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "5") Integer pageSize) {
+//        查询用户问题列表
         UserQuestionPageDTO dto = UserQuestionPageDTO.builder()
                 .pageNum(pageNum)
                 .pageSize(pageSize)

@@ -2,7 +2,6 @@ package zhijianhu.libraryserver.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import zhijianhu.constant.MessageType;
@@ -10,9 +9,7 @@ import zhijianhu.dto.PostLikeDTO;
 import zhijianhu.entity.Message;
 import zhijianhu.entity.PostLike;
 import zhijianhu.entity.Posts;
-import zhijianhu.entity.Users;
 import zhijianhu.libraryserver.mapper.PostLikeMapper;
-import zhijianhu.libraryserver.mapper.UsersMapper;
 import zhijianhu.libraryserver.service.MessageService;
 import zhijianhu.libraryserver.service.PostLikeService;
 import zhijianhu.libraryserver.service.PostService;
@@ -30,12 +27,11 @@ public class PostLikeServiceImpl extends ServiceImpl<PostLikeMapper, PostLike>
     implements PostLikeService {
     private final PostService postService;
     private final MessageService messageService;
-    private final UsersMapper usersMapper;
+
     @Lazy
-    public PostLikeServiceImpl(PostService postService, MessageService messageService, UsersMapper usersMapper) {
+    public PostLikeServiceImpl(PostService postService, MessageService messageService) {
         this.postService = postService;
         this.messageService = messageService;
-        this.usersMapper = usersMapper;
     }
 
     @Override
@@ -55,7 +51,7 @@ public class PostLikeServiceImpl extends ServiceImpl<PostLikeMapper, PostLike>
 
         Posts post = postService.getById(id);
         if(post!=null){
-            boolean save=false;
+            boolean save;
             if(like){
                 PostLike postLike = PostLike.builder()
                     .postId(id)

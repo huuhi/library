@@ -4,8 +4,7 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
+
 import org.springframework.stereotype.Service;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.AddUserQuestionDTO;
@@ -22,7 +21,6 @@ import zhijianhu.libraryserver.service.UserQuestionService;
 import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
 import zhijianhu.vo.PageVO;
-import zhijianhu.vo.UserPageVO;
 import zhijianhu.vo.UserQuestionPageVO;
 import zhijianhu.vo.UserQuestionVO;
 
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -118,9 +115,8 @@ public class UserQuestionServiceImpl extends ServiceImpl<UserQuestionMapper, Use
 
     @Override
     public Integer countUnread(Integer id) {
-/**     3.11 对此接口进行修改
- *         添加消息列表中未读数量
- */
+//     3.11 对此接口进行修改
+ //         添加消息列表中未读数量
         return lambdaQuery()
                 .eq(UserQuestion::getUserId, id)
                 .eq(UserQuestion::getIsReadStatus, StatusConstant.ENABLE)

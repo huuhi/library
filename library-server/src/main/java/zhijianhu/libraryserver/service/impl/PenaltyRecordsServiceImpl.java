@@ -3,7 +3,6 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import zhijianhu.constant.StatusConstant;
@@ -12,7 +11,6 @@ import zhijianhu.dto.PenaltyRecordPageDTO;
 import zhijianhu.entity.PenaltyRecords;
 import zhijianhu.libraryserver.mapper.BooksMapper;
 import zhijianhu.libraryserver.mapper.PenaltyRecordsMapper;
-import zhijianhu.libraryserver.service.BooksService;
 import zhijianhu.libraryserver.service.PenaltyRecordsService;
 import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
@@ -31,11 +29,14 @@ import java.util.List;
 @Service
 public class PenaltyRecordsServiceImpl extends ServiceImpl<PenaltyRecordsMapper, PenaltyRecords>
     implements PenaltyRecordsService {
-    @Autowired
     @Lazy
-    private UsersService usersService;
-    @Autowired
-    private BooksMapper booksService;
+    private final UsersService usersService;
+    private final BooksMapper booksService;
+
+    public PenaltyRecordsServiceImpl(UsersService usersService, BooksMapper booksService) {
+        this.usersService = usersService;
+        this.booksService = booksService;
+    }
 
     @Override
     public PageVO<PenaltyRecordVO> getByPage(PenaltyRecordPageDTO pageDTO) {

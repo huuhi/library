@@ -2,7 +2,6 @@ package zhijianhu.libraryserver.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import zhijianhu.entity.Activity;
 import zhijianhu.libraryserver.mapper.ActivityMapper;
@@ -19,8 +18,12 @@ import java.util.List;
 @Service
 public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity>
     implements ActivityService {
-    @Autowired
-    private ActivityMapper activityMapper;
+    private final ActivityMapper activityMapper;
+
+    public ActivityServiceImpl(ActivityMapper activityMapper) {
+        this.activityMapper = activityMapper;
+    }
+
     @Override
     public List<ActivityVO> getRecentActivities(Integer limit) {
         return activityMapper.limit(limit);

@@ -1,7 +1,6 @@
 package zhijianhu.libraryserver.controller.admin;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import zhijianhu.constant.MessageConstant;
 import zhijianhu.dto.BorrowDTO;
@@ -25,10 +24,13 @@ import java.util.List;
 @RequestMapping("/borrow")
 public class BorrowController {
 //    借阅管理
-    @Autowired
-    private BorrowRecordsService borrowService;
+    private final BorrowRecordsService borrowService;
 
-//    分页获取所有借阅记录
+    public BorrowController(BorrowRecordsService borrowService) {
+        this.borrowService = borrowService;
+    }
+
+    //    分页获取所有借阅记录
     @GetMapping
 //    @Cacheable(value = "borrowList", key = "'borrowList'")
     public Result<PageVO<BorrowVO>> borrow(@ModelAttribute BorrowPageDTO borrowPageDTO){

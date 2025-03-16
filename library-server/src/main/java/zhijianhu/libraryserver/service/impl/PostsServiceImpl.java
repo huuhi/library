@@ -3,7 +3,6 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zhijianhu.constant.Level;
@@ -35,7 +34,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     private final UsersService usersService;
     private final TagsService tagsService;
     private final PostLikeService postLikeService;
-    public PostsServiceImpl(PostTagsService postTagsService, UsersService usersService, UsersServiceImpl usersServiceImpl, TagsService tagsService, PostLikeService postLikeService) {
+    public PostsServiceImpl(PostTagsService postTagsService, UsersService usersService, TagsService tagsService, PostLikeService postLikeService) {
         this.postTagsService = postTagsService;
         this.usersService = usersService;
         this.tagsService = tagsService;
@@ -61,7 +60,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
                 .build();
         boolean save = save(post);
         if(save){
-//            判断条件，用户id和喜欢数量，帖子还没有发送成功喜欢数量是0，因为一个用户可以发多条帖子
+//            判断标题,标题是唯一的
             Integer id = lambdaQuery()
                     .eq(Posts::getUserId, userId)
                     .eq(Posts::getTitle,title)
@@ -129,9 +128,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
             Integer userId = p.getUserId();
             p.setUserName(Usermap.get(userId).getUserName());
             p.setUserImage(Usermap.get(userId).getImage());
-//        private List<TagsVO> tags;
-//
-////    判断是不是我的帖子
+//    判断是不是我的帖子
 //    private Boolean isMy;
             if(Objects.equals(userId, UserContext.getUserId())){
                 p.setIsMy(true);//是我的帖子

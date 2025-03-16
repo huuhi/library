@@ -4,7 +4,6 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails;
 import org.springframework.stereotype.Service;
 import zhijianhu.dto.AddressPageDTO;
 import zhijianhu.entity.StorageAddress;
@@ -14,7 +13,6 @@ import zhijianhu.query.PageQuery;
 import zhijianhu.vo.AddressVO;
 import zhijianhu.vo.PageVO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

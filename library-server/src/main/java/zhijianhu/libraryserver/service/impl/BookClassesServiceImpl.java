@@ -4,7 +4,6 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import zhijianhu.dto.ClassPageDTO;
 import zhijianhu.entity.BookClasses;
@@ -25,8 +24,11 @@ import java.util.*;
 public class BookClassesServiceImpl extends ServiceImpl<BookClassesMapper, BookClasses>
     implements BookClassesService {
 
-    @Autowired
-    private BookClassesMapper bookClassMapper;  // MyBatis-Plus的Mapper
+    private final BookClassesMapper bookClassMapper;  // MyBatis-Plus的Mapper
+
+    public BookClassesServiceImpl(BookClassesMapper bookClassMapper) {
+        this.bookClassMapper = bookClassMapper;
+    }
 
     /**
      * 根据分类ID获取完整路径

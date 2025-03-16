@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.BorrowDTO;
@@ -23,14 +23,12 @@ import zhijianhu.libraryserver.mapper.BorrowRecordsMapper;
 import zhijianhu.libraryserver.mapper.UsersMapper;
 import zhijianhu.libraryserver.service.BorrowRecordsService;
 import zhijianhu.libraryserver.service.PenaltyRecordsService;
-import zhijianhu.libraryserver.service.UsersService;
 import zhijianhu.query.PageQuery;
 import zhijianhu.vo.BorrowVO;
 import zhijianhu.vo.PageVO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +49,7 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
     private final PenaltyRecordsService penaltyRecordsService;
     private final BorrowRecordsMapper borrowerRecordMapper;
 
+    @Lazy
     public BorrowRecordsServiceImpl(BooksMapper booksService, UsersMapper usersService, PenaltyRecordsService penaltyRecordsService, BorrowRecordsMapper borrowerRecordMapper) {
         this.booksService = booksService;
         this.usersService = usersService;

@@ -5,7 +5,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import zhijianhu.dto.AuditLogDTO;
@@ -31,9 +30,12 @@ import zhijianhu.vo.PageVO;
 @Service
 public class AuditLogServiceImpl extends ServiceImpl<AuditLogMapper, AuditLog>
     implements AuditLogService {
-    @Autowired
     @Lazy
-    private UsersService userService;
+    private final UsersService userService;
+
+    public AuditLogServiceImpl(UsersService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public PageVO<AuditLogPageVO> getLogByPage(LogDTO logDTO) {

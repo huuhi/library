@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+import zhijianhu.constant.Level;
 import zhijianhu.constant.MessageType;
 import zhijianhu.constant.StatusConstant;
 import zhijianhu.dto.ExamineReviewDTO;
@@ -64,7 +65,7 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
         assert textResult != null;//断言不为空
         String s = textResult.getLevel();
         review.setDescription(textResult.getText());//设置评论的描述
-        if(s!=null&&!s.equals("none")){
+        if(s!=null&&!s.equals(Level.LEVEL_1)){
 //            说明评论有问题！
             review.setIsAudit(StatusConstant.DISABLE);
 //            保存但是不展示，让管理员审核
@@ -109,7 +110,7 @@ public class ReviewServiceImpl extends ServiceImpl<ReviewMapper, Review>
                     Users::getId,
                     Users::getUsername
             );
-            log.info("getReviewByBookId: "+list);
+            log.debug("根据书籍id或者帖子id获取评论列表 :{}",list);
             List<ReviewVO> reviewVO = BeanUtil.copyToList(list, ReviewVO.class);
             reviewVO.forEach(review->{
                 Integer id = review.getId();

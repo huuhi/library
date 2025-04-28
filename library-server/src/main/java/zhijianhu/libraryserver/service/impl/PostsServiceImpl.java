@@ -3,6 +3,7 @@ package zhijianhu.libraryserver.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zhijianhu.constant.Level;
@@ -11,6 +12,7 @@ import zhijianhu.entity.*;
 import zhijianhu.libraryserver.mapper.PostsMapper;
 import zhijianhu.libraryserver.service.*;
 import zhijianhu.result.TextResult;
+import zhijianhu.utils.RedisUtil;
 import zhijianhu.utils.ServiceUtils;
 import zhijianhu.utils.TextModerationPlusDemo;
 import zhijianhu.vo.PostVO;
@@ -18,7 +20,11 @@ import zhijianhu.vo.TagsVO;
 import zhijianhu.vo.UserNameAndImage;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static zhijianhu.constant.RedisConstant.CACHE_POST_KEY;
+import static zhijianhu.constant.RedisConstant.CACHE_POST_TTL;
 
 
 /**
@@ -34,11 +40,13 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     private final UsersService usersService;
     private final TagsService tagsService;
     private final PostLikeService postLikeService;
-    public PostsServiceImpl(PostTagsService postTagsService, UsersService usersService, TagsService tagsService, PostLikeService postLikeService) {
+    private final StringRedisTemplate redisTemplate;
+    public PostsServiceImpl(PostTagsService postTagsService, UsersService usersService, TagsService tagsService, PostLikeService postLikeService, StringRedisTemplate redisTemplate) {
         this.postTagsService = postTagsService;
         this.usersService = usersService;
         this.tagsService = tagsService;
         this.postLikeService = postLikeService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -86,6 +94,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     @Override
     @Transactional
     public boolean updatePostById(PostDTO postDTO) {
+        RedisUtil redisUtil = new RedisUtil(redisTemplate);
         String content = postDTO.getContent();
         String title = postDTO.getTitle();
         if(Violation(content, title)){
@@ -100,6 +109,8 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
         if(!update) return false;
 //          可能需要更新标签
         updateTag(id,postDTO.getTagsId());
+        String key=CACHE_POST_KEY+id;
+        redisUtil.delCache(key);//删除缓存
         return true;
     }
 
@@ -140,6 +151,13 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
 
     @Override
     public PostVO getPostById(Integer id) {
+        RedisUtil redisUtil = new RedisUtil(redisTemplate);
+        String postKey=CACHE_POST_KEY+id;
+//        因为有太多业务操作了，所以这里只能调用基本的存储
+        PostVO cache = redisUtil.getCache(postKey, PostVO.class);
+        if(cache!=null){
+            return cache;
+        }
         Posts post = getById(id);
         if(post!=null){
             ArrayList<Posts> list = new ArrayList<>();
@@ -162,6 +180,8 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
                 postVO.setIsLike(true);
             }
             postVO.setTags(tagMap.getOrDefault(postVO.getId(), Collections.emptyList()));
+//            存储在redis中
+            redisUtil.set(postKey,postVO,CACHE_POST_TTL, TimeUnit.MINUTES);
             return postVO;
         }
         return null;
@@ -170,7 +190,7 @@ public class PostsServiceImpl extends ServiceImpl<PostsMapper, Posts>
     private void updateTag(Integer id,List<Integer> newTags){
 //          List<Integer> newTags = postDTO.getTagsId();
         if(newTags==null||newTags.isEmpty()||newTags.contains(null)){
-            log.debug("不需要更新标签");
+            log.debug("不需要更新标签:{}",newTags);
             return;//不需要更新标签
         }
         log.debug("更新标签, id:{},新加标签id:{}",id,newTags);

@@ -11,5 +11,4 @@ public class Level {
     public static final String LEVEL_2="low";
     public static final String LEVEL_3="medium";
     public static final String LEVEL_4="high";
-
 }

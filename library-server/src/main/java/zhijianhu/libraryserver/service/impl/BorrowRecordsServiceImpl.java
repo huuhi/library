@@ -68,6 +68,8 @@ public class BorrowRecordsServiceImpl extends ServiceImpl<BorrowRecordsMapper, B
                 .eq(BorrowRecords::getStatus, StatusConstant.ENABLE)
                 .or()
 //                违规未还的
+                .eq(BorrowRecords::getUserId, userId)
+                .eq(BorrowRecords::getBookId, bookId)
                 .eq(BorrowRecords::getStatus, StatusConstant.ILLEGAL)
                 .one();
         one.setStatus(StatusConstant.DISABLE);

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
@@ -58,6 +59,8 @@ public class ActivityLogAspect {
             
             // 创建SpEL表达式上下文
             EvaluationContext context = new StandardEvaluationContext();
+            Object resultValue = context.lookupVariable("result");
+            if(resultValue == null) return;
 //            只有code==1时记录
             String condition = logActivity.condition();
             if (!condition.isEmpty()) {

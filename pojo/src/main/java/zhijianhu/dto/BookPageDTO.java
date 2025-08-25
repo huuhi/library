@@ -14,7 +14,7 @@ public class BookPageDTO {
     private Integer status;
     private Integer page=1;
     private Integer pageSize=10;
-    private Integer categoryId;
+//    private Integer categoryId;
 
 
 }

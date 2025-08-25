@@ -275,7 +275,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
             Integer id = clazz.getId();
             List<Integer> allSubCategoryIds = classesService.getAllSubCategoryIds(id);
             int count = booksService.lambdaQuery()
-                    .in(Books::getClazzId, allSubCategoryIds)
+//                    .in(Books::getClazzId, allSubCategoryIds)
                     .count().intValue();
             list.add(new BookCategoryStatVO(name,count));
         }

@@ -56,15 +56,15 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
         pageQuery.setPageSize(bookDTO.getPageSize());
         String name = bookDTO.getName();
         Integer status = bookDTO.getStatus();
-        Integer categoryId = bookDTO.getCategoryId();
-//        获取categoryId的所有子分类
-        List<Integer> categoryIds = null;
-        if (categoryId != null) {
-            categoryIds = bookClassesService.getAllSubCategoryIds(categoryId);
-            if (!categoryIds.contains(categoryId)) {
-                categoryIds.add(categoryId);
-            }
-        }
+//        Integer categoryId = bookDTO.getCategoryId();
+////        获取categoryId的所有子分类
+//        List<Integer> categoryIds = null;
+//        if (categoryId != null) {
+//            categoryIds = bookClassesService.getAllSubCategoryIds(categoryId);
+//            if (!categoryIds.contains(categoryId)) {
+//                categoryIds.add(categoryId);
+//            }
+//        }
         Page<Books> page = pageQuery.toMpPage(OrderItem.desc("publish_date"));
 //        获取到了父类父类的id，我们需要查找父类类id以及子类id
        Page<Books> booksPage = lambdaQuery()
@@ -74,32 +74,26 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
                         .or()                              // [!code focus]
                         .like(Books::getAuthor, name)      // [!code focus]
                 )
-               .in(categoryIds!=null, Books::getClazzId,categoryIds)
                 .page(page);
         return PageVO.of(booksPage, this::getBookVO);
     }
 
     @NotNull
     private BookVO getBookVO(Books book) {
+//        获取地址id
         Integer addressId = book.getAddressId();
-        Integer clazzId = book.getClazzId();
+//        Integer clazzId = book.getClazzId();
+//        获取图书状态码
         Integer status1 = book.getStatus();
-        Integer publishId = book.getPublishId();
+//        根据地址id获取详细地址信息
         StorageAddress storageAddress = storageAddressService.getById(addressId);
         String address ="未知地址";
         if(storageAddress!=null){
             address=storageAddress.getAddress();
         }
-        String fullPath = bookClassesService.getFullPath(clazzId);
-        Publish publish = publishService.getById(publishId);
-        String publishName = "未知出版社";
-        if(publish!=null){
-            publishName=publish.getName();
-        }
+
         BookVO bookVO = BeanUtil.copyProperties(book, BookVO.class);
         bookVO.setAddress(address);
-        bookVO.setClazz(fullPath);
-        bookVO.setPublish(publishName);
         if(Objects.equals(status1, StatusConstant.ENABLE)){
             bookVO.setStatus("可借");
         }else{
@@ -118,6 +112,7 @@ public class BooksServiceImpl extends ServiceImpl<BooksMapper, Books>
     @Override
     public BookVO getBookById(Integer id) {
         Books book = getById(id);
+        log.debug("图书："+book.toString());
         return getBookVO(book);
     }
 

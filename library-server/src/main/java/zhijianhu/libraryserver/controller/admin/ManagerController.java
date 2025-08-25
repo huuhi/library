@@ -49,7 +49,8 @@ public class ManagerController {
         BorrowingTrendsVO trendsData = usersService.getBorrowingTrends(months);
         return Result.success(trendsData);
     }
-    @GetMapping("/book-categories")
+//    报废接口
+//    @GetMapping("/book-categories")
     public Result<List<BookCategoryStatVO>> getBookCategoryStats() {
 //        获取图书分类统计信息
         List<BookCategoryStatVO> categoryStats = usersService.getBookCategoryStats();

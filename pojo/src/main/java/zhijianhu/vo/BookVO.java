@@ -25,11 +25,9 @@ public class BookVO implements Serializable {
      */
     private String author;
 
-    /**
-     * 分类ID
-     */
-    private String clazz;
-    private Integer clazzId;
+
+//    private String clazz;
+//    private Integer clazzId;
 
     /**
      * 存放地址ID
@@ -41,14 +39,15 @@ public class BookVO implements Serializable {
     /**
      * 出版社
      */
-    private String publish;
+    private String publishingHouse;
 
-    private Integer publishId;
+//    private Integer publishId;
 
     /**
      * 国际标准书号
      */
-    private String isbn;
+
+    private String ISBN;
 
     /**
      * 图书简介
@@ -71,6 +70,10 @@ public class BookVO implements Serializable {
      *
      */
     private String image;
+
+    private String quote;
+
+    private Double rating;
 
 
 }

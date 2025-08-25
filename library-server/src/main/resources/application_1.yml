@@ -1,0 +1,52 @@
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/library?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: ${DATA_PASSWORD}
+  servlet:
+    encoding:
+      charset: UTF-8
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+  data:
+    redis:
+      port: 6379
+      host: 39.108.100.68
+      database: 5
+      password: ${REDIS_PASSWORD}
+  aop:
+    auto: true
+
+logging:
+  level:
+    zhijianhu:
+      libraryserver:
+        controller: info
+        mapper: error
+        service: debug
+        aop: info
+
+mybatis-plus:
+  type-aliases-package: zhijianhu.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: isAudit
+      logic-delete-value: 0
+      logic-not-delete-value: 1
+  configuration:
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  pagination:
+    enabled: true
+library:
+  jwt:
+    user-ttl: 7200000
+  aliyun:
+    bucket-name: huzhijian-springboot-csse
+    region: cn-guangzhou
+    endpoint: https://oss-cn-guangzhou.aliyuncs.com
+    dir: library

@@ -42,7 +42,7 @@ public class BookDTO{
     /**
      * 出版社
      */
-    private Integer publishId;
+    private String publishingHouse;
 
     /**
      * 国际标准书号
@@ -68,6 +68,10 @@ public class BookDTO{
      *
      */
     private String image;
+
+    private String quote;
+
+    private Double rating;
 
 
 }

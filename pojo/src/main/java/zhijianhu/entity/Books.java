@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -18,6 +20,7 @@ import java.util.Date;
 @TableName(value ="books")
 @Data
 public class Books implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     /**
      * 主键
@@ -35,10 +38,7 @@ public class Books implements Serializable {
      */
     private String author;
 
-    /**
-     * 分类ID
-     */
-    private Integer clazzId;
+//    private Integer clazzId;
 
 
 
@@ -50,12 +50,13 @@ public class Books implements Serializable {
     /**
      * 出版社
      */
-    private Integer publishId;
+    private String publishingHouse;
 
     /**
      * 国际标准书号
      */
-    private String isbn;
+    @TableField("ISBN")
+    private String ISBN;
 
     /**
      * 图书简介
@@ -67,10 +68,13 @@ public class Books implements Serializable {
      */
     private Integer status;
 
+    @TableField(exist = false)
+    private String publishDateStr;
+
     /**
      * 出版日期
      */
-    private Date publishDate;
+    private LocalDate publishDate;
 
     /**
      * 创建时间
@@ -86,6 +90,11 @@ public class Books implements Serializable {
      * 
      */
     private String image;
+
+    @TableField("quote")
+    private String quote;
+
+    private Double rating;
 
 
 }
